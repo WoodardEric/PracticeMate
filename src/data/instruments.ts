@@ -1,0 +1,126 @@
+import type { InstrumentProfile } from '../types/music';
+
+export const INSTRUMENTS: InstrumentProfile[] = [
+  {
+    id: 'flute',
+    label: 'Flute',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'oboe',
+    label: 'Oboe',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'bb-clarinet',
+    label: 'Bb Clarinet',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 2,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'bb-bass-clarinet',
+    label: 'Bass Clarinet in Bb',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 2,
+    writtenOctaveShift: 1,
+  },
+  {
+    id: 'eb-alto-sax',
+    label: 'Alto Sax in Eb',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 9,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'bb-tenor-sax',
+    label: 'Tenor Sax in Bb',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 2,
+    writtenOctaveShift: 1,
+  },
+  {
+    id: 'eb-baritone-sax',
+    label: 'Baritone Sax in Eb',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 9,
+    writtenOctaveShift: 1,
+  },
+  {
+    id: 'bb-trumpet',
+    label: 'Trumpet in Bb',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 2,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'f-horn',
+    label: 'French Horn in F',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 7,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'trombone',
+    label: 'Trombone',
+    clef: 'bass',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'euphonium',
+    label: 'Euphonium (Bass Clef)',
+    clef: 'bass',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'tuba',
+    label: 'Tuba',
+    clef: 'bass',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'violin',
+    label: 'Violin',
+    clef: 'treble',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'viola',
+    label: 'Viola',
+    clef: 'alto',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'cello',
+    label: 'Cello',
+    clef: 'bass',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+  {
+    id: 'double-bass',
+    label: 'Double Bass',
+    clef: 'bass',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 1,
+  },
+  {
+    id: 'bassoon',
+    label: 'Bassoon',
+    clef: 'bass',
+    writtenPitchOffsetSemitones: 0,
+    writtenOctaveShift: 0,
+  },
+];
+
+export const DEFAULT_INSTRUMENT = INSTRUMENTS[0];
+
