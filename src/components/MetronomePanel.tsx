@@ -42,14 +42,14 @@ export function MetronomePanel({
             <input
               type="range"
               min="30"
-              max="220"
+              max="300"
               value={settings.bpm}
               onChange={(event) => onBpmChange(Number(event.target.value))}
             />
             <input
               type="number"
               min="30"
-              max="220"
+              max="300"
               value={settings.bpm}
               onChange={(event) => onBpmChange(Number(event.target.value))}
             />

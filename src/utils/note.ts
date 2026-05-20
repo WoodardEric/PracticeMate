@@ -77,5 +77,5 @@ export function clampBpm(value: number): number {
     return 60;
   }
 
-  return Math.min(220, Math.max(30, Math.round(value)));
+  return Math.min(300, Math.max(30, Math.round(value)));
 }

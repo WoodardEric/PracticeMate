@@ -1,5 +1,5 @@
 import { INSTRUMENTS } from '../data/instruments';
-import { frequencyToConcertNote, midiToNote, transposeConcertNote } from './note';
+import { clampBpm, frequencyToConcertNote, midiToNote, transposeConcertNote } from './note';
 
 describe('frequencyToConcertNote', () => {
   it('maps A4 correctly with zero cents offset', () => {
@@ -59,5 +59,17 @@ describe('transposeConcertNote', () => {
   it('can respell transposed notes with sharps', () => {
     const instrument = INSTRUMENTS.find((item) => item.id === 'viola')!;
     expect(transposeConcertNote(concertBb3, instrument, 'sharp').display).toBe('A\u266F3');
+  });
+});
+
+describe('clampBpm', () => {
+  it('limits BPM to the supported metronome range', () => {
+    expect(clampBpm(12)).toBe(30);
+    expect(clampBpm(301)).toBe(300);
+  });
+
+  it('rounds valid BPM values inside the supported range', () => {
+    expect(clampBpm(299.6)).toBe(300);
+    expect(clampBpm(80.4)).toBe(80);
   });
 });
