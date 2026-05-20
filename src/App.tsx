@@ -6,14 +6,20 @@ import { TunerPanel } from './components/TunerPanel';
 import { DEFAULT_INSTRUMENT, INSTRUMENTS } from './data/instruments';
 import { useMetronome } from './hooks/useMetronome';
 import { useTuner } from './hooks/useTuner';
+import type { AccidentalPreference } from './types/music';
 
 export default function App() {
   const [selectedInstrumentId, setSelectedInstrumentId] = useState(DEFAULT_INSTRUMENT.id);
+  const [accidentalPreference, setAccidentalPreference] =
+    useState<AccidentalPreference>('flat');
 
   const selectedInstrument =
     INSTRUMENTS.find((instrument) => instrument.id === selectedInstrumentId) ?? DEFAULT_INSTRUMENT;
 
-  const { pitchState, start: startTuner, stop: stopTuner } = useTuner(selectedInstrument);
+  const { pitchState, start: startTuner, stop: stopTuner } = useTuner(
+    selectedInstrument,
+    accidentalPreference,
+  );
   const {
     settings,
     start: startMetronome,
@@ -52,6 +58,8 @@ export default function App() {
           instrumentLabel={selectedInstrument.label}
           clef={selectedInstrument.clef}
           pitchState={pitchState}
+          accidentalPreference={accidentalPreference}
+          onAccidentalPreferenceChange={setAccidentalPreference}
           onStart={startTuner}
           onStop={stopTuner}
         />

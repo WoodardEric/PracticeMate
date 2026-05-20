@@ -12,8 +12,14 @@ describe('frequencyToConcertNote', () => {
   it('rounds to the closest note near semitone boundaries', () => {
     const note = frequencyToConcertNote(455);
 
-    expect(note?.display).toBe('Bb4');
+    expect(note?.display).toBe('B\u266D4');
     expect(note?.centsOff).toBeLessThan(0);
+  });
+
+  it('can prefer sharp spellings for enharmonic notes', () => {
+    const note = frequencyToConcertNote(455, 'sharp');
+
+    expect(note?.display).toBe('A\u266F4');
   });
 });
 
@@ -37,17 +43,21 @@ describe('transposeConcertNote', () => {
 
   it('keeps trombone in concert pitch', () => {
     const instrument = INSTRUMENTS.find((item) => item.id === 'trombone')!;
-    expect(transposeConcertNote(concertBb3, instrument).display).toBe('Bb3');
+    expect(transposeConcertNote(concertBb3, instrument).display).toBe('B\u266D3');
   });
 
   it('keeps viola in concert pitch', () => {
     const instrument = INSTRUMENTS.find((item) => item.id === 'viola')!;
-    expect(transposeConcertNote(concertBb3, instrument).display).toBe('Bb3');
+    expect(transposeConcertNote(concertBb3, instrument).display).toBe('B\u266D3');
   });
 
   it('writes double bass one octave above sounding pitch', () => {
     const instrument = INSTRUMENTS.find((item) => item.id === 'double-bass')!;
-    expect(transposeConcertNote(concertBb3, instrument).display).toBe('Bb4');
+    expect(transposeConcertNote(concertBb3, instrument).display).toBe('B\u266D4');
+  });
+
+  it('can respell transposed notes with sharps', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'viola')!;
+    expect(transposeConcertNote(concertBb3, instrument, 'sharp').display).toBe('A\u266F3');
   });
 });
-

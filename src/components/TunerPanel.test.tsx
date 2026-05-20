@@ -24,6 +24,8 @@ describe('TunerPanel', () => {
         instrumentLabel="Viola"
         clef="alto"
         pitchState={baseState}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
         onStart={() => undefined}
         onStop={() => undefined}
       />,
@@ -48,13 +50,15 @@ describe('TunerPanel', () => {
           centsOff: 1.2,
           signalConfidence: 0.97,
         }}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
         onStart={() => undefined}
         onStop={() => undefined}
       />,
     );
 
     expect(screen.getByText('C4')).toBeInTheDocument();
-    expect(screen.getByText('Bb3')).toBeInTheDocument();
+    expect(screen.getByText('B\u266D3')).toBeInTheDocument();
     expect(screen.getByText('+1.2 cents')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Stop tuner' })).toBeInTheDocument();
   });
@@ -70,6 +74,8 @@ describe('TunerPanel', () => {
           listening: true,
           signalConfidence: 0.31,
         }}
+        accidentalPreference="sharp"
+        onAccidentalPreferenceChange={() => undefined}
         onStart={() => undefined}
         onStop={() => undefined}
       />,

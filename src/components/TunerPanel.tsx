@@ -1,10 +1,15 @@
-import type { Clef, DetectedPitch } from '../types/music';
+import type { AccidentalPreference, Clef, DetectedPitch } from '../types/music';
 import { StaffNote } from './StaffNote';
+
+const FLAT_SYMBOL = '\u266D';
+const SHARP_SYMBOL = '\u266F';
 
 interface TunerPanelProps {
   instrumentLabel: string;
   clef: Clef;
   pitchState: DetectedPitch;
+  accidentalPreference: AccidentalPreference;
+  onAccidentalPreferenceChange: (preference: AccidentalPreference) => void;
   onStart: () => void;
   onStop: () => void;
 }
@@ -33,6 +38,8 @@ export function TunerPanel({
   instrumentLabel,
   clef,
   pitchState,
+  accidentalPreference,
+  onAccidentalPreferenceChange,
   onStart,
   onStop,
 }: TunerPanelProps) {
@@ -86,8 +93,34 @@ export function TunerPanel({
         </div>
       </div>
 
-      <StaffNote note={pitchState.writtenNote} clef={clef} />
+      <div className="staff-panel">
+        <StaffNote note={pitchState.writtenNote} clef={clef} />
+        <div className="enharmonic-toggle-row">
+          <span className="enharmonic-toggle-label">Enharmonic</span>
+          <div
+            className="enharmonic-toggle"
+            role="group"
+            aria-label="Enharmonic spelling"
+          >
+            <button
+              type="button"
+              className={`enharmonic-option ${accidentalPreference === 'flat' ? 'is-active' : ''}`}
+              aria-pressed={accidentalPreference === 'flat'}
+              onClick={() => onAccidentalPreferenceChange('flat')}
+            >
+              {FLAT_SYMBOL}
+            </button>
+            <button
+              type="button"
+              className={`enharmonic-option ${accidentalPreference === 'sharp' ? 'is-active' : ''}`}
+              aria-pressed={accidentalPreference === 'sharp'}
+              onClick={() => onAccidentalPreferenceChange('sharp')}
+            >
+              {SHARP_SYMBOL}
+            </button>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
-

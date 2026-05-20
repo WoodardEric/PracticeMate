@@ -8,7 +8,7 @@ describe('toVexNoteSpec', () => {
     expect(spec).toEqual({
       key: 'b/3',
       accidental: 'b',
-      label: 'Bb3',
+      label: 'B\u266D3',
     });
   });
 
@@ -28,8 +28,17 @@ describe('toVexNoteSpec', () => {
     expect(spec).toEqual({
       key: 'g/4',
       accidental: 'b',
-      label: 'Gb4',
+      label: 'G\u266D4',
+    });
+  });
+
+  it('formats a sharp-compatible pitch as its sharp spelling', () => {
+    const spec = toVexNoteSpec(midiToNote(66, 'sharp'));
+
+    expect(spec).toEqual({
+      key: 'f/4',
+      accidental: '#',
+      label: 'F\u266F4',
     });
   });
 });
-

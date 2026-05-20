@@ -1,4 +1,5 @@
 export type Clef = 'treble' | 'bass' | 'alto';
+export type AccidentalPreference = 'flat' | 'sharp';
 
 export type PermissionState =
   | 'idle'
@@ -44,4 +45,3 @@ export interface MetronomeSettings {
   volume: number;
   isRunning: boolean;
 }
-

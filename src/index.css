@@ -273,6 +273,11 @@ input[type="checkbox"] {
   place-items: center;
 }
 
+.staff-panel {
+  display: grid;
+  gap: 0.65rem;
+}
+
 .staff-shell svg {
   max-width: 100%;
   height: auto;
@@ -281,6 +286,44 @@ input[type="checkbox"] {
 .staff-empty {
   text-align: center;
   color: var(--text-dim);
+}
+
+.enharmonic-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.enharmonic-toggle-label {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+}
+
+.enharmonic-toggle {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding: 0.2rem;
+  border: 1px solid var(--panel-strong);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.enharmonic-option {
+  min-width: 2.8rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  background: transparent;
+  color: var(--text-dim);
+  font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Noto Music", Aptos, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.enharmonic-option.is-active {
+  background: linear-gradient(135deg, var(--accent), #ffd48e);
+  color: #17263a;
 }
 
 .metronome-grid {
@@ -326,8 +369,11 @@ input[type="checkbox"] {
     width: 100%;
   }
 
+  .enharmonic-toggle-row {
+    justify-content: space-between;
+  }
+
   .bpm-row {
     grid-template-columns: 1fr;
   }
 }
-

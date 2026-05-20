@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PitchDetector } from 'pitchy';
-import type { DetectedPitch, InstrumentProfile } from '../types/music';
+import type { AccidentalPreference, DetectedPitch, InstrumentProfile } from '../types/music';
 import { frequencyToConcertNote, transposeConcertNote } from '../utils/note';
 
 const ANALYSER_SIZE = 2048;
@@ -27,7 +27,10 @@ function getRootAudioContext(): typeof AudioContext | null {
   return window.AudioContext ?? ((window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext ?? null);
 }
 
-export function useTuner(instrument: InstrumentProfile) {
+export function useTuner(
+  instrument: InstrumentProfile,
+  accidentalPreference: AccidentalPreference = 'flat',
+) {
   const [pitchState, setPitchState] = useState<DetectedPitch>(EMPTY_STATE);
 
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -51,10 +54,11 @@ export function useTuner(instrument: InstrumentProfile) {
 
       return {
         ...current,
-        writtenNote: transposeConcertNote(current.concertNote, instrument),
+        concertNote: frequencyToConcertNote(current.frequencyHz ?? current.concertNote.frequency, accidentalPreference),
+        writtenNote: transposeConcertNote(current.concertNote, instrument, accidentalPreference),
       };
     });
-  }, [instrument]);
+  }, [accidentalPreference, instrument]);
 
   const samplePitch = () => {
     const analyser = analyserRef.current;
@@ -93,14 +97,14 @@ export function useTuner(instrument: InstrumentProfile) {
         signalConfidence: clarity,
       }));
     } else {
-      const concertNote = frequencyToConcertNote(frequencyHz);
+      const concertNote = frequencyToConcertNote(frequencyHz, accidentalPreference);
 
       setPitchState({
         permission: 'granted',
         listening: true,
         frequencyHz,
         concertNote,
-        writtenNote: concertNote ? transposeConcertNote(concertNote, instrument) : null,
+        writtenNote: concertNote ? transposeConcertNote(concertNote, instrument, accidentalPreference) : null,
         centsOff: concertNote?.centsOff ?? null,
         signalConfidence: clarity,
       });
