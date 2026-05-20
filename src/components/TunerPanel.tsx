@@ -1,11 +1,13 @@
-import type { AccidentalPreference, Clef, DetectedPitch } from '../types/music';
+import type { AccidentalPreference, Clef, DetectedPitch, InstrumentProfile } from '../types/music';
 import { StaffNote } from './StaffNote';
 
 const FLAT_SYMBOL = '\u266D';
 const SHARP_SYMBOL = '\u266F';
 
 interface TunerPanelProps {
-  instrumentLabel: string;
+  instruments: InstrumentProfile[];
+  selectedInstrumentId: string;
+  onInstrumentChange: (instrumentId: string) => void;
   clef: Clef;
   pitchState: DetectedPitch;
   accidentalPreference: AccidentalPreference;
@@ -35,7 +37,9 @@ function centsClass(centsOff: number | null) {
 }
 
 export function TunerPanel({
-  instrumentLabel,
+  instruments,
+  selectedInstrumentId,
+  onInstrumentChange,
   clef,
   pitchState,
   accidentalPreference,
@@ -53,9 +57,20 @@ export function TunerPanel({
   return (
     <section className="panel tuner-panel">
       <div className="panel-header">
-        <div>
+        <div className="tuner-header-copy">
           <p className="eyebrow">Tuner</p>
-          <h2>{instrumentLabel}</h2>
+          <select
+            className="tuner-instrument-select"
+            value={selectedInstrumentId}
+            onChange={(event) => onInstrumentChange(event.target.value)}
+            aria-label="Select instrument"
+          >
+            {instruments.map((instrument) => (
+              <option key={instrument.id} value={instrument.id}>
+                {instrument.label}
+              </option>
+            ))}
+          </select>
         </div>
         <button
           type="button"

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { TunerPanel } from './TunerPanel';
 import type { DetectedPitch } from '../types/music';
+import { INSTRUMENTS } from '../data/instruments';
 import { midiToNote } from '../utils/note';
 
 vi.mock('./StaffNote', () => ({
@@ -21,7 +22,9 @@ describe('TunerPanel', () => {
   it('shows idle guidance when no stable pitch is present', () => {
     render(
       <TunerPanel
-        instrumentLabel="Viola"
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
         clef="alto"
         pitchState={baseState}
         accidentalPreference="flat"
@@ -33,13 +36,16 @@ describe('TunerPanel', () => {
 
     expect(screen.getByText('Written note')).toBeInTheDocument();
     expect(screen.getByText('No stable pitch')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Select instrument' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start tuner' })).toBeInTheDocument();
   });
 
   it('renders the detected written and concert notes', () => {
     render(
       <TunerPanel
-        instrumentLabel="Bb Clarinet"
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="bb-clarinet"
+        onInstrumentChange={() => undefined}
         clef="treble"
         pitchState={{
           permission: 'granted',
@@ -66,7 +72,9 @@ describe('TunerPanel', () => {
   it('surfaces waiting state while listening without a lock', () => {
     render(
       <TunerPanel
-        instrumentLabel="Trumpet in Bb"
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="bb-trumpet"
+        onInstrumentChange={() => undefined}
         clef="treble"
         pitchState={{
           ...baseState,
@@ -88,7 +96,9 @@ describe('TunerPanel', () => {
   it('keeps showing the last locked pitch when confidence drops', () => {
     render(
       <TunerPanel
-        instrumentLabel="Viola"
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
         clef="alto"
         pitchState={{
           permission: 'granted',

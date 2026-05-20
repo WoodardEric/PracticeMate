@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { InstrumentSelect } from './components/InstrumentSelect';
 import { MetronomePanel } from './components/MetronomePanel';
 import { StatusBanner } from './components/StatusBanner';
 import { TunerPanel } from './components/TunerPanel';
@@ -48,14 +47,10 @@ export default function App() {
       />
 
       <div className="layout-grid">
-        <InstrumentSelect
-          instruments={INSTRUMENTS}
-          selectedId={selectedInstrument.id}
-          onChange={setSelectedInstrumentId}
-        />
-
         <TunerPanel
-          instrumentLabel={selectedInstrument.label}
+          instruments={INSTRUMENTS}
+          selectedInstrumentId={selectedInstrument.id}
+          onInstrumentChange={setSelectedInstrumentId}
           clef={selectedInstrument.clef}
           pitchState={pitchState}
           accidentalPreference={accidentalPreference}
