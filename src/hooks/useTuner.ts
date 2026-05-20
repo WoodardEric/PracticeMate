@@ -90,10 +90,6 @@ export function useTuner(
         ...current,
         permission: current.permission === 'requesting' ? 'granted' : current.permission,
         listening: true,
-        frequencyHz: null,
-        concertNote: null,
-        writtenNote: null,
-        centsOff: null,
         signalConfidence: clarity,
       }));
     } else {

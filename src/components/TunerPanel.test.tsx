@@ -84,4 +84,31 @@ describe('TunerPanel', () => {
     expect(screen.getByText('Waiting')).toBeInTheDocument();
     expect(screen.getByText('31%')).toBeInTheDocument();
   });
+
+  it('keeps showing the last locked pitch when confidence drops', () => {
+    render(
+      <TunerPanel
+        instrumentLabel="Viola"
+        clef="alto"
+        pitchState={{
+          permission: 'granted',
+          listening: true,
+          frequencyHz: 369.99,
+          concertNote: midiToNote(66, 'sharp'),
+          writtenNote: midiToNote(66, 'sharp'),
+          centsOff: -2.4,
+          signalConfidence: 0.12,
+        }}
+        accidentalPreference="sharp"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getAllByText('F\u266F4')).toHaveLength(2);
+    expect(screen.getByText('370.0 Hz')).toBeInTheDocument();
+    expect(screen.getByText('-2.4 cents')).toBeInTheDocument();
+    expect(screen.getByText('12%')).toBeInTheDocument();
+  });
 });

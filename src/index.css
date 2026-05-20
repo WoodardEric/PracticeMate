@@ -160,6 +160,12 @@ input[type="number"] {
   color: #fff8ef;
 }
 
+option,
+optgroup {
+  color: #17263a;
+  background: #f5f0e8;
+}
+
 input[type="range"] {
   width: 100%;
   accent-color: var(--accent);
