@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { TunerPanel } from './TunerPanel';
 import type { DetectedPitch } from '../types/music';
 import { INSTRUMENTS } from '../data/instruments';
@@ -120,5 +120,27 @@ describe('TunerPanel', () => {
     expect(screen.getByText('370.0 Hz')).toBeInTheDocument();
     expect(screen.getByText('-2.4 cents')).toBeInTheDocument();
     expect(screen.getByText('12%')).toBeInTheDocument();
+  });
+
+  it('toggles enharmonic preference even when clicking the active segment', () => {
+    const onAccidentalPreferenceChange = vi.fn();
+
+    render(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
+        clef="alto"
+        pitchState={baseState}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={onAccidentalPreferenceChange}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '\u266D' }));
+
+    expect(onAccidentalPreferenceChange).toHaveBeenCalledWith('sharp');
   });
 });

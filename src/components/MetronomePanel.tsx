@@ -28,7 +28,7 @@ export function MetronomePanel({
   const { top, bottom } = parseTimeSignature(settings.timeSignature);
 
   return (
-    <section className="panel">
+    <section className="panel metronome-panel">
       <div className="panel-header">
         <div>
           <p className="eyebrow">Metronome</p>
@@ -66,42 +66,45 @@ export function MetronomePanel({
 
         <label className="field">
           <span>Time signature</span>
-          <div className="time-signature-row">
-            <input
-              type="number"
-              min="2"
-              max="16"
-              aria-label="Time signature top"
-              value={top}
-              onChange={(event) =>
-                onTimeSignatureChange(formatTimeSignature(clampTimeSignatureTop(Number(event.target.value)), bottom))
-              }
-            />
-            <span className="time-signature-separator" aria-hidden="true">
-              /
+          <div className="time-signature-stack">
+            <div className="time-signature-row">
+              <input
+                type="number"
+                min="2"
+                max="16"
+                aria-label="Time signature top"
+                value={top}
+                onChange={(event) =>
+                  onTimeSignatureChange(
+                    formatTimeSignature(clampTimeSignatureTop(Number(event.target.value)), bottom),
+                  )
+                }
+              />
+              <span className="time-signature-separator" aria-hidden="true">
+                /
+              </span>
+              <input
+                type="number"
+                min="2"
+                max="16"
+                aria-label="Time signature bottom"
+                value={bottom}
+                onChange={(event) =>
+                  onTimeSignatureChange(
+                    formatTimeSignature(top, stepTimeSignatureBottom(Number(event.target.value), bottom)),
+                  )
+                }
+              />
+            </div>
+            <span className="accent-toggle">
+              <span>Accent first beat</span>
+              <input
+                type="checkbox"
+                checked={settings.accentEnabled}
+                onChange={(event) => onAccentToggle(event.target.checked)}
+              />
             </span>
-            <input
-              type="number"
-              min="2"
-              max="16"
-              aria-label="Time signature bottom"
-              value={bottom}
-              onChange={(event) =>
-                onTimeSignatureChange(
-                  formatTimeSignature(top, stepTimeSignatureBottom(Number(event.target.value), bottom)),
-                )
-              }
-            />
           </div>
-        </label>
-
-        <label className="field field-inline">
-          <span>Accent first beat</span>
-          <input
-            type="checkbox"
-            checked={settings.accentEnabled}
-            onChange={(event) => onAccentToggle(event.target.checked)}
-          />
         </label>
 
         <label className="field">
