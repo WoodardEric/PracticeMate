@@ -1,4 +1,10 @@
 import type { MetronomeSettings } from '../types/music';
+import {
+  clampTimeSignatureTop,
+  formatTimeSignature,
+  parseTimeSignature,
+  stepTimeSignatureBottom,
+} from '../utils/metronome';
 
 interface MetronomePanelProps {
   settings: MetronomeSettings;
@@ -19,6 +25,8 @@ export function MetronomePanel({
   onAccentToggle,
   onVolumeChange,
 }: MetronomePanelProps) {
+  const { top, bottom } = parseTimeSignature(settings.timeSignature);
+
   return (
     <section className="panel">
       <div className="panel-header">
@@ -58,17 +66,33 @@ export function MetronomePanel({
 
         <label className="field">
           <span>Time signature</span>
-          <select
-            value={settings.timeSignature}
-            onChange={(event) =>
-              onTimeSignatureChange(event.target.value as MetronomeSettings['timeSignature'])
-            }
-          >
-            <option value="2/4">2/4</option>
-            <option value="3/4">3/4</option>
-            <option value="4/4">4/4</option>
-            <option value="6/8">6/8</option>
-          </select>
+          <div className="time-signature-row">
+            <input
+              type="number"
+              min="2"
+              max="16"
+              aria-label="Time signature top"
+              value={top}
+              onChange={(event) =>
+                onTimeSignatureChange(formatTimeSignature(clampTimeSignatureTop(Number(event.target.value)), bottom))
+              }
+            />
+            <span className="time-signature-separator" aria-hidden="true">
+              /
+            </span>
+            <input
+              type="number"
+              min="2"
+              max="16"
+              aria-label="Time signature bottom"
+              value={bottom}
+              onChange={(event) =>
+                onTimeSignatureChange(
+                  formatTimeSignature(top, stepTimeSignatureBottom(Number(event.target.value), bottom)),
+                )
+              }
+            />
+          </div>
         </label>
 
         <label className="field field-inline">
@@ -95,4 +119,3 @@ export function MetronomePanel({
     </section>
   );
 }
-

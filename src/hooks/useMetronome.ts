@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { MetronomeSettings } from '../types/music';
+import { DEFAULT_TIME_SIGNATURE, normalizeTimeSignature, parseTimeSignature } from '../utils/metronome';
 import { clampBpm } from '../utils/note';
 
 const LOOKAHEAD_MS = 25;
@@ -7,7 +8,7 @@ const SCHEDULE_AHEAD_SECONDS = 0.1;
 
 const DEFAULT_SETTINGS: MetronomeSettings = {
   bpm: 80,
-  timeSignature: '4/4',
+  timeSignature: DEFAULT_TIME_SIGNATURE,
   accentEnabled: true,
   volume: 0.55,
   isRunning: false,
@@ -32,7 +33,7 @@ export function useMetronome() {
   }, []);
 
   function beatsPerMeasure(timeSignature: MetronomeSettings['timeSignature']): number {
-    return Number.parseInt(timeSignature.split('/')[0], 10);
+    return parseTimeSignature(timeSignature).top;
   }
 
   function tickDurationSeconds(currentSettings: MetronomeSettings): number {
@@ -136,7 +137,7 @@ export function useMetronome() {
   function setTimeSignature(timeSignature: MetronomeSettings['timeSignature']) {
     setSettings((current) => ({
       ...current,
-      timeSignature,
+      timeSignature: normalizeTimeSignature(timeSignature),
     }));
   }
 
@@ -164,4 +165,3 @@ export function useMetronome() {
     setVolume,
   };
 }
-

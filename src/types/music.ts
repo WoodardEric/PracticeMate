@@ -1,5 +1,6 @@
 export type Clef = 'treble' | 'bass' | 'alto';
 export type AccidentalPreference = 'flat' | 'sharp';
+export type TimeSignature = `${number}/${number}`;
 
 export type PermissionState =
   | 'idle'
@@ -40,7 +41,7 @@ export interface DetectedPitch {
 
 export interface MetronomeSettings {
   bpm: number;
-  timeSignature: '2/4' | '3/4' | '4/4' | '6/8';
+  timeSignature: TimeSignature;
   accentEnabled: boolean;
   volume: number;
   isRunning: boolean;

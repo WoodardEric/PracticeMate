@@ -353,6 +353,19 @@ input[type="checkbox"] {
   align-items: center;
 }
 
+.time-signature-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.time-signature-separator {
+  color: #fff8ef;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
 @media (max-width: 920px) {
   .layout-grid,
   .tuner-grid {
@@ -390,5 +403,9 @@ input[type="checkbox"] {
 
   .bpm-row {
     grid-template-columns: 1fr;
+  }
+
+  .time-signature-row {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   }
 }
