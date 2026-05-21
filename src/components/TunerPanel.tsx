@@ -111,15 +111,7 @@ export function TunerPanel({
           </div>
 
           <StaffNote note={pitchState.writtenNote} clef={clef} />
-        </div>
-
-        <div className="enharmonic-toggle-row staff-toggle-row">
-          <span className="enharmonic-toggle-label">Enharmonic</span>
-          <div
-            className="enharmonic-toggle"
-            role="group"
-            aria-label="Enharmonic spelling"
-          >
+          <div className="enharmonic-toggle-row" role="group" aria-label="Enharmonic spelling">
             <button
               type="button"
               className={`enharmonic-option ${accidentalPreference === 'flat' ? 'is-active' : ''}`}

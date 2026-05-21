@@ -312,20 +312,15 @@ input[type="checkbox"] {
 }
 
 .staff-layout {
-  display: grid;
-  gap: 0.65rem 1rem;
-  grid-template-columns: minmax(12rem, 16rem) minmax(13rem, 17rem);
+  display: flex;
   justify-content: center;
-  align-items: stretch;
 }
 
 .staff-main-row {
-  display: contents;
-}
-
-.staff-toggle-row {
-  grid-column: 2;
-  width: 100%;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(12rem, 16rem) minmax(13rem, 17rem) auto;
+  align-items: end;
 }
 
 .staff-render {
@@ -351,30 +346,20 @@ input[type="checkbox"] {
 
 .enharmonic-toggle-row {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-}
-
-.enharmonic-toggle-label {
-  color: var(--text-dim);
-  font-size: 0.9rem;
-}
-
-.enharmonic-toggle {
-  display: inline-grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  flex-direction: column;
+  align-items: stretch;
+  margin-bottom: 0.85rem;
   padding: 0.2rem;
   border: 1px solid var(--panel-strong);
-  border-radius: 999px;
+  border-radius: 18px;
   background: rgba(255, 255, 255, 0.05);
 }
 
 .enharmonic-option {
-  min-width: 2.8rem;
+  min-width: 2.6rem;
   border: 0;
-  border-radius: 999px;
-  padding: 0.35rem 0.8rem;
+  border-radius: 14px;
+  padding: 0.45rem 0.55rem;
   background: transparent;
   color: var(--text-dim);
   font-family: "Segoe UI Symbol", "Noto Sans Symbols 2", "Noto Music", Aptos, serif;
@@ -431,12 +416,13 @@ input[type="checkbox"] {
 }
 
 @media (max-width: 920px) {
-  .staff-layout {
-    grid-template-columns: 1fr;
+  .staff-main-row {
+    grid-template-columns: 1fr minmax(0, auto);
+    align-items: end;
   }
 
-  .staff-toggle-row {
-    grid-column: 1;
+  .staff-main-row > :first-child {
+    grid-column: 1 / -1;
   }
 
   .hero h1 {
@@ -469,7 +455,7 @@ input[type="checkbox"] {
   }
 
   .enharmonic-toggle-row {
-    justify-content: space-between;
+    margin-bottom: 0.5rem;
   }
 
   .note-card-side {
