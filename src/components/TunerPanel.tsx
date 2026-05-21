@@ -49,6 +49,7 @@ export function TunerPanel({
 }: TunerPanelProps) {
   const noteLabel = pitchState.writtenNote?.display ?? '--';
   const concertLabel = pitchState.concertNote?.display ?? 'No stable pitch';
+  const nextAccidentalPreference = accidentalPreference === 'flat' ? 'sharp' : 'flat';
   const centsLabel =
     pitchState.centsOff === null
       ? '--'
@@ -82,12 +83,6 @@ export function TunerPanel({
       </div>
 
       <div className="tuner-grid">
-        <div className="note-card">
-          <p className="label">Written note</p>
-          <p className="hero-note">{noteLabel}</p>
-          <p className="subdued">Shown in {clef} clef for the selected instrument.</p>
-        </div>
-
         <div className="readout-card">
           <div className="readout-row">
             <span>Concert pitch</span>
@@ -108,9 +103,17 @@ export function TunerPanel({
         </div>
       </div>
 
-      <div className="staff-panel">
-        <StaffNote note={pitchState.writtenNote} clef={clef} />
-        <div className="enharmonic-toggle-row">
+      <div className="staff-layout">
+        <div className="staff-main-row">
+          <div className="note-card note-card-side">
+            <p className="label note-card-label">Written note</p>
+            <p className="hero-note">{noteLabel}</p>
+          </div>
+
+          <StaffNote note={pitchState.writtenNote} clef={clef} />
+        </div>
+
+        <div className="enharmonic-toggle-row staff-toggle-row">
           <span className="enharmonic-toggle-label">Enharmonic</span>
           <div
             className="enharmonic-toggle"
@@ -121,7 +124,7 @@ export function TunerPanel({
               type="button"
               className={`enharmonic-option ${accidentalPreference === 'flat' ? 'is-active' : ''}`}
               aria-pressed={accidentalPreference === 'flat'}
-              onClick={() => onAccidentalPreferenceChange('flat')}
+              onClick={() => onAccidentalPreferenceChange(nextAccidentalPreference)}
             >
               {FLAT_SYMBOL}
             </button>
@@ -129,7 +132,7 @@ export function TunerPanel({
               type="button"
               className={`enharmonic-option ${accidentalPreference === 'sharp' ? 'is-active' : ''}`}
               aria-pressed={accidentalPreference === 'sharp'}
-              onClick={() => onAccidentalPreferenceChange('sharp')}
+              onClick={() => onAccidentalPreferenceChange(nextAccidentalPreference)}
             >
               {SHARP_SYMBOL}
             </button>

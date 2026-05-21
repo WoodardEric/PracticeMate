@@ -48,7 +48,8 @@ button {
 }
 
 .app-shell {
-  width: min(1120px, calc(100vw - 2rem));
+  width: calc(100vw - 3rem);
+  max-width: 1600px;
   margin: 0 auto;
   padding: 2.5rem 0 3rem;
 }
@@ -110,7 +111,7 @@ button {
 .layout-grid {
   display: grid;
   gap: 1.25rem;
-  grid-template-columns: minmax(0, 1.45fr) minmax(0, 0.95fr);
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .panel {
@@ -219,7 +220,7 @@ input[type="checkbox"] {
 .tuner-grid {
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 1fr);
   margin-bottom: 1rem;
 }
 
@@ -236,13 +237,34 @@ input[type="checkbox"] {
   padding: 1rem;
 }
 
+.note-card-side {
+  min-height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.1rem 1.2rem;
+}
+
 .label {
   margin: 0;
   color: var(--text-dim);
 }
 
+.note-card-label {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--panel-strong);
+  border-radius: 999px;
+  background: transparent;
+}
+
 .hero-note {
-  margin: 0.3rem 0 0;
+  margin: 0;
+  text-align: center;
   font-size: clamp(2.4rem, 5vw, 4rem);
   font-weight: 800;
   letter-spacing: -0.05em;
@@ -282,20 +304,44 @@ input[type="checkbox"] {
 }
 
 .staff-shell {
-  min-height: 210px;
-  padding: 0.75rem;
+  min-height: 220px;
+  width: 100%;
+  padding: 0.75rem 0;
   display: grid;
   place-items: center;
 }
 
-.staff-panel {
+.staff-layout {
   display: grid;
-  gap: 0.65rem;
+  gap: 0.65rem 1rem;
+  grid-template-columns: minmax(12rem, 16rem) minmax(13rem, 17rem);
+  justify-content: center;
+  align-items: stretch;
+}
+
+.staff-main-row {
+  display: contents;
+}
+
+.staff-toggle-row {
+  grid-column: 2;
+  width: 100%;
+}
+
+.staff-render {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 100%;
+  height: 100%;
+  display: block;
 }
 
 .staff-shell svg {
-  max-width: 100%;
+  width: auto;
+  max-width: none;
   height: auto;
+  overflow: visible;
+  display: block;
 }
 
 .staff-empty {
@@ -344,6 +390,12 @@ input[type="checkbox"] {
 .metronome-grid {
   display: grid;
   gap: 1rem;
+  grid-template-columns: minmax(0, 1.45fr) minmax(13rem, 0.7fr) minmax(0, 0.95fr);
+  align-items: start;
+}
+
+.metronome-panel .panel-header {
+  align-items: center;
 }
 
 .bpm-row {
@@ -360,20 +412,39 @@ input[type="checkbox"] {
   align-items: center;
 }
 
+.time-signature-stack {
+  display: grid;
+  gap: 0.65rem;
+}
+
 .time-signature-separator {
   color: #fff8ef;
   font-size: 1.1rem;
   font-weight: 700;
 }
 
+.accent-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 @media (max-width: 920px) {
-  .layout-grid,
-  .tuner-grid {
+  .staff-layout {
     grid-template-columns: 1fr;
+  }
+
+  .staff-toggle-row {
+    grid-column: 1;
   }
 
   .hero h1 {
     max-width: 14ch;
+  }
+
+  .metronome-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -401,11 +472,19 @@ input[type="checkbox"] {
     justify-content: space-between;
   }
 
+  .note-card-side {
+    justify-items: center;
+  }
+
   .bpm-row {
     grid-template-columns: 1fr;
   }
 
   .time-signature-row {
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+
+  .accent-toggle {
+    justify-content: space-between;
   }
 }

@@ -8,56 +8,93 @@ interface StaffNoteProps {
 }
 
 export function StaffNote({ note, clef }: StaffNoteProps) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const shellRef = useRef<HTMLDivElement | null>(null);
+  const renderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const shell = shellRef.current;
+    const renderTarget = renderRef.current;
 
-    if (!container || !note) {
+    if (!shell || !renderTarget || !note) {
       return;
     }
 
     let active = true;
+    let resizeObserver: ResizeObserver | null = null;
 
     void (async () => {
-      const { Accidental, Formatter, Renderer, Stave, StaveNote, Voice } = await import('vexflow');
+      const { Accidental, Metrics, Renderer, Stave, StaveNote, TickContext } =
+        await import('vexflow');
 
-      if (!active || !containerRef.current) {
+      if (!active || !shellRef.current || !renderRef.current) {
         return;
       }
 
-      containerRef.current.innerHTML = '';
+      const renderStaff = () => {
+        if (!shellRef.current || !renderRef.current) {
+          return;
+        }
 
-      const width = 280;
-      const height = 170;
-      const renderer = new Renderer(containerRef.current, Renderer.Backends.SVG);
-      renderer.resize(width, height);
+        renderRef.current.innerHTML = '';
 
-      const context = renderer.getContext();
-      const stave = new Stave(12, 28, width - 24);
-      stave.addClef(clef);
-      stave.setContext(context).draw();
+        const shellWidth = Math.floor(shellRef.current.clientWidth);
+        const width = Math.max(280, shellWidth - 16);
+        const height = 220;
+        const scale = 1.25;
+        const logicalWidth = width / scale;
+        const logicalHeight = height / scale;
+        const renderer = new Renderer(renderRef.current, Renderer.Backends.SVG);
+        renderer.resize(width, height);
 
-      const noteSpec = toVexNoteSpec(note);
-      const staveNote = new StaveNote({
-        clef,
-        keys: [noteSpec.key],
-        duration: 'q',
+        const context = renderer.getContext();
+        context.scale(scale, scale);
+
+        const staveWidth = Math.max(180, logicalWidth - 40);
+        const staveX = Math.floor((logicalWidth - staveWidth) / 2);
+        const noteSpec = toVexNoteSpec(note);
+        const staveNote = new StaveNote({
+          clef,
+          keys: [noteSpec.key],
+          duration: 'q',
+        });
+
+        if (noteSpec.accidental) {
+          staveNote.addModifier(new Accidental(noteSpec.accidental), 0);
+        }
+
+        const tickContext = new TickContext().addTickable(staveNote).preFormat();
+        const positionNote = (stave: InstanceType<typeof Stave>) => {
+          const noteStartOffset = stave.getNoteStartX() + Metrics.get('Stave.padding', 0);
+          const noteheadHalfWidth = staveNote.getGlyphWidth() / 2;
+          const staffCenterX = stave.getX() + stave.getWidth() / 2;
+          tickContext.setX(Math.round(staffCenterX - noteStartOffset - noteheadHalfWidth));
+          staveNote.setStave(stave);
+        };
+
+        const draftStave = new Stave(staveX, 0, staveWidth);
+        draftStave.addClef(clef);
+        const staffHeight = draftStave.getBoundingBox().getH();
+        const staveY = Math.round(logicalHeight / 2 - staffHeight / 2);
+        const stave = new Stave(staveX, staveY, staveWidth);
+        stave.addClef(clef);
+        stave.setContext(context).draw();
+
+        positionNote(stave);
+        staveNote.setContext(context).draw();
+      };
+
+      renderStaff();
+
+      resizeObserver = new ResizeObserver(() => {
+        renderStaff();
       });
 
-      if (noteSpec.accidental) {
-        staveNote.addModifier(new Accidental(noteSpec.accidental), 0);
-      }
-
-      const voice = new Voice({ numBeats: 1, beatValue: 4 });
-      voice.addTickables([staveNote]);
-
-      new Formatter().joinVoices([voice]).format([voice], 110);
-      voice.draw(context, stave);
+      resizeObserver.observe(shellRef.current);
     })();
 
     return () => {
       active = false;
+      resizeObserver?.disconnect();
     };
   }, [clef, note]);
 
@@ -70,8 +107,12 @@ export function StaffNote({ note, clef }: StaffNoteProps) {
   }
 
   return (
-    <div className="staff-shell">
-      <div ref={containerRef} aria-label={`${note.display} on ${clef} clef staff`} />
+    <div ref={shellRef} className="staff-shell">
+      <div
+        ref={renderRef}
+        className="staff-render"
+        aria-label={`${note.display} on ${clef} clef staff`}
+      />
     </div>
   );
 }
