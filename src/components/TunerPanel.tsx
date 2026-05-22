@@ -1,8 +1,16 @@
+import { useEffect, useRef, useState } from 'react';
 import type { AccidentalPreference, Clef, DetectedPitch, InstrumentProfile } from '../types/music';
+import { nextSmoothedScaleCents, stabilizeScaleDisplayCents } from './tunerScale';
 import { StaffNote } from './StaffNote';
 
 const FLAT_SYMBOL = '\u266D';
 const SHARP_SYMBOL = '\u266F';
+const MIN_CENTS = -50;
+const MAX_CENTS = 50;
+const IN_TUNE_THRESHOLD = 5;
+const CLOSE_THRESHOLD = 15;
+const SCALE_TRACK_PADDING_REM = 0.75;
+const SCALE_SUBTICKS = [-40, -30, -20, -10, 10, 20, 30, 40] as const;
 
 interface TunerPanelProps {
   instruments: InstrumentProfile[];
@@ -29,11 +37,44 @@ function centsClass(centsOff: number | null) {
     return 'neutral';
   }
 
-  if (Math.abs(centsOff) <= 5) {
+  if (Math.abs(centsOff) <= IN_TUNE_THRESHOLD) {
     return 'in-tune';
   }
 
   return centsOff > 0 ? 'sharp' : 'flat';
+}
+
+function centsScaleState(centsOff: number | null) {
+  if (centsOff === null) {
+    return 'neutral';
+  }
+
+  const absoluteCentsOff = Math.abs(centsOff);
+
+  if (absoluteCentsOff <= IN_TUNE_THRESHOLD) {
+    return 'in-tune';
+  }
+
+  if (absoluteCentsOff <= CLOSE_THRESHOLD) {
+    return 'close';
+  }
+
+  return 'out-of-tune';
+}
+
+function clampCents(centsOff: number | null) {
+  if (centsOff === null) {
+    return 0;
+  }
+
+  return Math.min(MAX_CENTS, Math.max(MIN_CENTS, centsOff));
+}
+
+function indicatorLeft(centsOff: number | null) {
+  const clampedCentsOff = clampCents(centsOff);
+  const ratio = Number(((clampedCentsOff - MIN_CENTS) / (MAX_CENTS - MIN_CENTS)).toFixed(4));
+
+  return `calc(${SCALE_TRACK_PADDING_REM}rem + ${ratio} * (100% - ${SCALE_TRACK_PADDING_REM * 2}rem))`;
 }
 
 export function TunerPanel({
@@ -47,9 +88,32 @@ export function TunerPanel({
   onStart,
   onStop,
 }: TunerPanelProps) {
+  const [smoothedScaleCents, setSmoothedScaleCents] = useState<number | null>(pitchState.centsOff);
+  const previousConcertMidiRef = useRef<number | null>(pitchState.concertNote?.midi ?? null);
+
+  useEffect(() => {
+    const currentConcertMidi = pitchState.concertNote?.midi ?? null;
+    const noteChanged =
+      previousConcertMidiRef.current !== null &&
+      currentConcertMidi !== null &&
+      previousConcertMidiRef.current !== currentConcertMidi;
+
+    setSmoothedScaleCents((previousSmoothedCents) =>
+      nextSmoothedScaleCents({
+        previousSmoothedCents,
+        rawCents: pitchState.centsOff,
+        noteChanged,
+      }),
+    );
+
+    previousConcertMidiRef.current = currentConcertMidi;
+  }, [pitchState.centsOff, pitchState.concertNote?.midi]);
+
   const noteLabel = pitchState.writtenNote?.display ?? '--';
   const concertLabel = pitchState.concertNote?.display ?? 'No stable pitch';
   const nextAccidentalPreference = accidentalPreference === 'flat' ? 'sharp' : 'flat';
+  const scaleCentsOff = stabilizeScaleDisplayCents(smoothedScaleCents);
+  const scaleState = centsScaleState(scaleCentsOff);
   const centsLabel =
     pitchState.centsOff === null
       ? '--'
@@ -129,6 +193,39 @@ export function TunerPanel({
               {SHARP_SYMBOL}
             </button>
           </div>
+        </div>
+      </div>
+
+      <div className="tuner-cents-scale">
+        <div
+          className="tuner-cents-scale-track"
+          role="meter"
+          aria-label="Cents deviation scale"
+          aria-valuemin={MIN_CENTS}
+          aria-valuemax={MAX_CENTS}
+          aria-valuenow={clampCents(scaleCentsOff)}
+          aria-valuetext={pitchState.centsOff === null ? 'No stable pitch' : `${pitchState.centsOff.toFixed(1)} cents`}
+        >
+          {SCALE_SUBTICKS.map((tick) => (
+            <div
+              key={tick}
+              className="tuner-cents-scale-subtick"
+              style={{ left: indicatorLeft(tick) }}
+              data-testid="cents-scale-subtick"
+              aria-hidden="true"
+            />
+          ))}
+          <div className="tuner-cents-scale-center-tick" aria-hidden="true" />
+          <div
+            className={`tuner-cents-scale-indicator tuner-cents-scale-indicator-${scaleState}`}
+            style={{ left: indicatorLeft(scaleCentsOff) }}
+            data-testid="cents-scale-indicator"
+          />
+        </div>
+        <div className="tuner-cents-scale-labels" aria-hidden="true">
+          <span>-50</span>
+          <span>0</span>
+          <span>+50</span>
         </div>
       </div>
     </section>

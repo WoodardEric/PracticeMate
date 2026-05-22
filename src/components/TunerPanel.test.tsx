@@ -18,26 +18,36 @@ const baseState: DetectedPitch = {
   signalConfidence: 0,
 };
 
+function renderTunerPanel(pitchState: DetectedPitch = baseState) {
+  render(
+    <TunerPanel
+      instruments={INSTRUMENTS}
+      selectedInstrumentId="viola"
+      onInstrumentChange={() => undefined}
+      clef="alto"
+      pitchState={pitchState}
+      accidentalPreference="flat"
+      onAccidentalPreferenceChange={() => undefined}
+      onStart={() => undefined}
+      onStop={() => undefined}
+    />,
+  );
+}
+
 describe('TunerPanel', () => {
   it('shows idle guidance when no stable pitch is present', () => {
-    render(
-      <TunerPanel
-        instruments={INSTRUMENTS}
-        selectedInstrumentId="viola"
-        onInstrumentChange={() => undefined}
-        clef="alto"
-        pitchState={baseState}
-        accidentalPreference="flat"
-        onAccidentalPreferenceChange={() => undefined}
-        onStart={() => undefined}
-        onStop={() => undefined}
-      />,
-    );
+    renderTunerPanel();
 
     expect(screen.getByText('Written note')).toBeInTheDocument();
     expect(screen.getByText('No stable pitch')).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Select instrument' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start tuner' })).toBeInTheDocument();
+    expect(screen.getByText('+50')).toBeInTheDocument();
+    expect(screen.getAllByTestId('cents-scale-subtick')).toHaveLength(8);
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveClass('tuner-cents-scale-indicator-neutral');
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
+      left: 'calc(0.75rem + 0.5 * (100% - 1.5rem))',
+    });
   });
 
   it('renders the detected written and concert notes', () => {
@@ -66,6 +76,7 @@ describe('TunerPanel', () => {
     expect(screen.getByText('C4')).toBeInTheDocument();
     expect(screen.getByText('B\u266D3')).toBeInTheDocument();
     expect(screen.getByText('+1.2 cents')).toBeInTheDocument();
+    expect(screen.queryByText('0 = B\u266D3')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Stop tuner' })).toBeInTheDocument();
   });
 
@@ -120,6 +131,200 @@ describe('TunerPanel', () => {
     expect(screen.getByText('370.0 Hz')).toBeInTheDocument();
     expect(screen.getByText('-2.4 cents')).toBeInTheDocument();
     expect(screen.getByText('12%')).toBeInTheDocument();
+  });
+
+  it('renders a green indicator when the pitch is in tune', () => {
+    renderTunerPanel({
+      permission: 'granted',
+      listening: true,
+      frequencyHz: 440,
+      concertNote: midiToNote(69),
+      writtenNote: midiToNote(69),
+      centsOff: 3.4,
+      signalConfidence: 0.98,
+    });
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveClass('tuner-cents-scale-indicator-in-tune');
+  });
+
+  it('locks the indicator at center for sub-cent drift', () => {
+    renderTunerPanel({
+      permission: 'granted',
+      listening: true,
+      frequencyHz: 440,
+      concertNote: midiToNote(69),
+      writtenNote: midiToNote(69),
+      centsOff: 0.5,
+      signalConfidence: 0.98,
+    });
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
+      left: 'calc(0.75rem + 0.5 * (100% - 1.5rem))',
+    });
+  });
+
+  it('renders a yellow indicator when the pitch is close', () => {
+    renderTunerPanel({
+      permission: 'granted',
+      listening: true,
+      frequencyHz: 440,
+      concertNote: midiToNote(69),
+      writtenNote: midiToNote(69),
+      centsOff: 11.8,
+      signalConfidence: 0.98,
+    });
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveClass('tuner-cents-scale-indicator-close');
+  });
+
+  it('renders a red indicator when the pitch is out of tune', () => {
+    renderTunerPanel({
+      permission: 'granted',
+      listening: true,
+      frequencyHz: 440,
+      concertNote: midiToNote(69),
+      writtenNote: midiToNote(69),
+      centsOff: -22.1,
+      signalConfidence: 0.98,
+    });
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveClass('tuner-cents-scale-indicator-out-of-tune');
+  });
+
+  it('moves the indicator gradually toward a new target on the same note', () => {
+    const { rerender } = render(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
+        clef="alto"
+        pitchState={{
+          permission: 'granted',
+          listening: true,
+          frequencyHz: 440,
+          concertNote: midiToNote(69),
+          writtenNote: midiToNote(69),
+          centsOff: -25,
+          signalConfidence: 0.98,
+        }}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
+      left: 'calc(0.75rem + 0.25 * (100% - 1.5rem))',
+    });
+
+    rerender(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
+        clef="alto"
+        pitchState={{
+          permission: 'granted',
+          listening: true,
+          frequencyHz: 440,
+          concertNote: midiToNote(69),
+          writtenNote: midiToNote(69),
+          centsOff: 25,
+          signalConfidence: 0.98,
+        }}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
+      left: 'calc(0.75rem + 0.34 * (100% - 1.5rem))',
+    });
+  });
+
+  it('clamps the indicator at the negative edge when seeded beyond the scale', () => {
+    render(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
+        clef="alto"
+        pitchState={{
+          permission: 'granted',
+          listening: true,
+          frequencyHz: 440,
+          concertNote: midiToNote(69),
+          writtenNote: midiToNote(69),
+          centsOff: -80,
+          signalConfidence: 0.98,
+        }}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
+      left: 'calc(0.75rem + 0 * (100% - 1.5rem))',
+    });
+  });
+
+  it('reseeds and clamps the indicator at the positive edge when the note changes', () => {
+    const { rerender } = render(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
+        clef="alto"
+        pitchState={{
+          permission: 'granted',
+          listening: true,
+          frequencyHz: 440,
+          concertNote: midiToNote(69),
+          writtenNote: midiToNote(69),
+          centsOff: -80,
+          signalConfidence: 0.98,
+        }}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
+      left: 'calc(0.75rem + 0 * (100% - 1.5rem))',
+    });
+
+    rerender(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        selectedInstrumentId="viola"
+        onInstrumentChange={() => undefined}
+        clef="alto"
+        pitchState={{
+          permission: 'granted',
+          listening: true,
+          frequencyHz: 466.16,
+          concertNote: midiToNote(70),
+          writtenNote: midiToNote(70),
+          centsOff: 80,
+          signalConfidence: 0.98,
+        }}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
+      left: 'calc(0.75rem + 1 * (100% - 1.5rem))',
+    });
   });
 
   it('toggles enharmonic preference even when clicking the active segment', () => {
