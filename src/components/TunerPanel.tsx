@@ -114,6 +114,7 @@ export function TunerPanel({
   const nextAccidentalPreference = accidentalPreference === 'flat' ? 'sharp' : 'flat';
   const scaleCentsOff = stabilizeScaleDisplayCents(smoothedScaleCents);
   const scaleState = centsScaleState(scaleCentsOff);
+  const showDebugReadout = !import.meta.env.PROD;
   const centsLabel =
     pitchState.centsOff === null
       ? '--'
@@ -146,26 +147,28 @@ export function TunerPanel({
         </button>
       </div>
 
-      <div className="tuner-grid">
-        <div className="readout-card">
-          <div className="readout-row">
-            <span>Concert pitch</span>
-            <strong>{concertLabel}</strong>
-          </div>
-          <div className="readout-row">
-            <span>Detected frequency</span>
-            <strong>{formatFrequency(pitchState.frequencyHz)}</strong>
-          </div>
-          <div className="readout-row">
-            <span>Pitch center</span>
-            <strong className={centsClass(pitchState.centsOff)}>{centsLabel}</strong>
-          </div>
-          <div className="readout-row">
-            <span>Signal confidence</span>
-            <strong>{formatConfidence(pitchState.signalConfidence)}</strong>
+      {showDebugReadout ? (
+        <div className="tuner-grid">
+          <div className="readout-card">
+            <div className="readout-row">
+              <span>Concert pitch</span>
+              <strong>{concertLabel}</strong>
+            </div>
+            <div className="readout-row">
+              <span>Detected frequency</span>
+              <strong>{formatFrequency(pitchState.frequencyHz)}</strong>
+            </div>
+            <div className="readout-row">
+              <span>Pitch center</span>
+              <strong className={centsClass(pitchState.centsOff)}>{centsLabel}</strong>
+            </div>
+            <div className="readout-row">
+              <span>Signal confidence</span>
+              <strong>{formatConfidence(pitchState.signalConfidence)}</strong>
+            </div>
           </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="staff-layout">
         <div className="staff-main-row">
