@@ -31,15 +31,6 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <section className="hero">
-        <p className="eyebrow">PracticeMate</p>
-        <h1>Browser-based tuner and metronome for ensemble practice.</h1>
-        <p className="hero-copy">
-          Pick your instrument, tune to a steady note, and keep time without installing anything.
-          The tuner shows the written note in the clef your part uses.
-        </p>
-      </section>
-
       <StatusBanner
         permission={pitchState.permission}
         tunerListening={pitchState.listening}
