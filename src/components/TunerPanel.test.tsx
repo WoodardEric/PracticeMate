@@ -49,7 +49,7 @@ describe('TunerPanel', () => {
     expect(screen.getByRole('combobox', { name: 'Select instrument' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start tuner' })).toBeInTheDocument();
     expect(screen.getByText('+50')).toBeInTheDocument();
-    expect(screen.getAllByTestId('cents-scale-subtick')).toHaveLength(8);
+    expect(screen.getAllByTestId('cents-scale-subtick')).toHaveLength(4);
     expect(screen.getByTestId('cents-scale-indicator')).toHaveClass('tuner-cents-scale-indicator-neutral');
     expect(screen.getByTestId('cents-scale-indicator')).toHaveStyle({
       left: 'calc(0.75rem + 0.5 * (100% - 1.5rem))',

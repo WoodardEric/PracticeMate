@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { AccidentalPreference, DetectedPitch, InstrumentProfile } from '../types/music';
 import { derivePitch } from '../utils/note';
 import { nextSmoothedScaleCents, stabilizeScaleDisplayCents } from './tunerScale';
@@ -11,7 +11,12 @@ const MAX_CENTS = 50;
 const IN_TUNE_THRESHOLD = 5;
 const CLOSE_THRESHOLD = 15;
 const SCALE_TRACK_PADDING_REM = 0.75;
-const SCALE_SUBTICKS = [-40, -30, -20, -10, 10, 20, 30, 40] as const;
+const SCALE_BOUNDARY_TICKS = [
+  -CLOSE_THRESHOLD,
+  -IN_TUNE_THRESHOLD,
+  IN_TUNE_THRESHOLD,
+  CLOSE_THRESHOLD,
+] as const;
 
 interface TunerPanelProps {
   instruments: InstrumentProfile[];
@@ -71,12 +76,28 @@ function clampCents(centsOff: number | null) {
   return Math.min(MAX_CENTS, Math.max(MIN_CENTS, centsOff));
 }
 
-function indicatorLeft(centsOff: number | null) {
+function scaleRatio(centsOff: number) {
   const clampedCentsOff = clampCents(centsOff);
-  const ratio = Number(((clampedCentsOff - MIN_CENTS) / (MAX_CENTS - MIN_CENTS)).toFixed(4));
+
+  return Number(((clampedCentsOff - MIN_CENTS) / (MAX_CENTS - MIN_CENTS)).toFixed(4));
+}
+
+function indicatorLeft(centsOff: number | null) {
+  const ratio = scaleRatio(centsOff ?? 0);
 
   return `calc(${SCALE_TRACK_PADDING_REM}rem + ${ratio} * (100% - ${SCALE_TRACK_PADDING_REM * 2}rem))`;
 }
+
+function scalePercent(centsOff: number) {
+  return `${scaleRatio(centsOff) * 100}%`;
+}
+
+const SCALE_TRACK_STYLE = {
+  '--cents-scale-close-negative-boundary': scalePercent(-CLOSE_THRESHOLD),
+  '--cents-scale-in-tune-negative-boundary': scalePercent(-IN_TUNE_THRESHOLD),
+  '--cents-scale-in-tune-positive-boundary': scalePercent(IN_TUNE_THRESHOLD),
+  '--cents-scale-close-positive-boundary': scalePercent(CLOSE_THRESHOLD),
+} as CSSProperties;
 
 export function TunerPanel({
   instruments,
@@ -209,13 +230,14 @@ export function TunerPanel({
         <div
           className="tuner-cents-scale-track"
           role="meter"
+          style={SCALE_TRACK_STYLE}
           aria-label="Cents deviation scale"
           aria-valuemin={MIN_CENTS}
           aria-valuemax={MAX_CENTS}
           aria-valuenow={clampCents(scaleCentsOff)}
           aria-valuetext={centsOff === null ? 'No stable pitch' : `${centsOff.toFixed(1)} cents`}
         >
-          {SCALE_SUBTICKS.map((tick) => (
+          {SCALE_BOUNDARY_TICKS.map((tick) => (
             <div
               key={tick}
               className="tuner-cents-scale-subtick"
