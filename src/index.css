@@ -151,6 +151,12 @@ button {
   color: var(--text-dim);
 }
 
+.field-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
 .field span {
   font-size: 0.95rem;
 }
@@ -485,8 +491,15 @@ input[type="checkbox"] {
 .bpm-row {
   display: grid;
   gap: 0.8rem;
-  grid-template-columns: minmax(0, 1fr) 7rem;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
+}
+
+input[type="number"].bpm-input {
+  flex: 0 0 7rem;
+  max-width: 7rem;
+  min-width: 7rem;
+  width: 7rem;
 }
 
 .time-signature-row {
@@ -567,6 +580,14 @@ input[type="checkbox"] {
 
   .bpm-row {
     grid-template-columns: 1fr;
+  }
+
+  input[type="number"].bpm-input {
+    flex: 0 0 7rem;
+    margin-left: 0;
+    max-width: 7rem;
+    min-width: 7rem;
+    width: 7rem;
   }
 
   .time-signature-row {

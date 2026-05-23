@@ -45,17 +45,20 @@ export function MetronomePanel({
 
       <div className="metronome-grid">
         <label className="field">
-          <span>BPM</span>
-          <div className="bpm-row">
+          <span className="field-header">
+            <span>BPM</span>
             <input
-              type="range"
+              className="bpm-input"
+              type="number"
               min="30"
               max="300"
               value={settings.bpm}
               onChange={(event) => onBpmChange(Number(event.target.value))}
             />
+          </span>
+          <div className="bpm-row">
             <input
-              type="number"
+              type="range"
               min="30"
               max="300"
               value={settings.bpm}
