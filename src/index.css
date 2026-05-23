@@ -18,8 +18,11 @@
   --accent: #f8b84d;
   --accent-deep: #d58f21;
   --active: #7fd3b2;
+  --active-soft: #7fd3b2;
   --warning: #ffcc8f;
+  --warning-soft: #ffcc8f;
   --danger: #ff7a6a;
+  --danger-soft: #ff7a6a;
   --text-dim: rgba(245, 240, 232, 0.74);
   --shadow: 0 22px 50px rgba(5, 13, 24, 0.3);
 }
@@ -405,11 +408,16 @@ input[type="checkbox"] {
   background:
     linear-gradient(
       90deg,
-      rgba(255, 122, 106, 0.24) 0%,
-      rgba(255, 204, 143, 0.3) 22%,
-      rgba(127, 211, 178, 0.28) 50%,
-      rgba(255, 204, 143, 0.3) 78%,
-      rgba(255, 122, 106, 0.24) 100%
+      var(--danger-soft) 0%,
+      var(--danger-soft) var(--cents-scale-close-negative-boundary),
+      var(--warning-soft) var(--cents-scale-close-negative-boundary),
+      var(--warning-soft) var(--cents-scale-in-tune-negative-boundary),
+      var(--active-soft) var(--cents-scale-in-tune-negative-boundary),
+      var(--active-soft) var(--cents-scale-in-tune-positive-boundary),
+      var(--warning-soft) var(--cents-scale-in-tune-positive-boundary),
+      var(--warning-soft) var(--cents-scale-close-positive-boundary),
+      var(--danger-soft) var(--cents-scale-close-positive-boundary),
+      var(--danger-soft) 100%
     );
   transform: translateY(-50%);
 }
@@ -419,7 +427,7 @@ input[type="checkbox"] {
   top: 50%;
   left: 50%;
   width: 2px;
-  height: 1.1rem;
+  height: 1.2rem;
   border-radius: 999px;
   background: rgba(255, 248, 239, 0.92);
   transform: translate(-50%, -50%);
@@ -429,9 +437,9 @@ input[type="checkbox"] {
   position: absolute;
   top: 50%;
   width: 1px;
-  height: 0.6rem;
+  height: 0.75rem;
   border-radius: 999px;
-  background: rgba(255, 248, 239, 0.26);
+  background: rgba(255, 248, 239, 0.22);
   transform: translate(-50%, -50%);
 }
 
