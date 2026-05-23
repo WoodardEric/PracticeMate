@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type { Clef, NamedNote } from '../types/music';
 import { toVexNoteSpec } from '../utils/notation';
+import { loadVexflow } from './vexflowLoader';
 
 interface StaffNoteProps {
   note: NamedNote | null;
@@ -24,7 +25,7 @@ export function StaffNote({ note, clef }: StaffNoteProps) {
 
     void (async () => {
       const { Accidental, Metrics, Renderer, Stave, StaveNote, TickContext } =
-        await import('vexflow');
+        await loadVexflow();
 
       if (!active || !shellRef.current || !renderRef.current) {
         return;

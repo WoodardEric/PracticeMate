@@ -166,7 +166,7 @@ export function TunerPanel({
             </div>
             <div className="readout-row">
               <span>Pitch center</span>
-              <strong className={centsClass(pitchState.centsOff)}>{centsLabel}</strong>
+              <strong className={centsClass(centsOff)}>{centsLabel}</strong>
             </div>
             <div className="readout-row">
               <span>Signal confidence</span>

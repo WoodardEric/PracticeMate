@@ -1,11 +1,17 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MetronomePanel } from './components/MetronomePanel';
 import { StatusBanner } from './components/StatusBanner';
 import { TunerPanel } from './components/TunerPanel';
+import { loadVexflow } from './components/vexflowLoader';
 import { DEFAULT_INSTRUMENT, INSTRUMENTS } from './data/instruments';
 import { useMetronome } from './hooks/useMetronome';
 import { useTuner } from './hooks/useTuner';
 import type { AccidentalPreference } from './types/music';
+
+type WindowWithIdleCallback = Window & {
+  cancelIdleCallback?: (handle: number) => void;
+  requestIdleCallback?: (callback: () => void) => number;
+};
 
 export default function App() {
   const [selectedInstrumentId, setSelectedInstrumentId] = useState(DEFAULT_INSTRUMENT.id);
@@ -25,6 +31,32 @@ export default function App() {
     setAccentEnabled,
     setVolume,
   } = useMetronome();
+
+  useEffect(() => {
+    const browserWindow = window as WindowWithIdleCallback;
+    let idleCallbackHandle: number | null = null;
+    let timeoutHandle: number | null = null;
+
+    const preloadStaffRenderer = () => {
+      void loadVexflow();
+    };
+
+    if (browserWindow.requestIdleCallback) {
+      idleCallbackHandle = browserWindow.requestIdleCallback(preloadStaffRenderer);
+    } else {
+      timeoutHandle = window.setTimeout(preloadStaffRenderer, 0);
+    }
+
+    return () => {
+      if (idleCallbackHandle !== null && browserWindow.cancelIdleCallback) {
+        browserWindow.cancelIdleCallback(idleCallbackHandle);
+      }
+
+      if (timeoutHandle !== null) {
+        window.clearTimeout(timeoutHandle);
+      }
+    };
+  }, []);
 
   return (
     <main className="app-shell">
