@@ -1,5 +1,11 @@
 import { INSTRUMENTS } from '../data/instruments';
-import { clampBpm, frequencyToConcertNote, midiToNote, transposeConcertNote } from './note';
+import {
+  clampBpm,
+  derivePitch,
+  frequencyToConcertNote,
+  midiToNote,
+  transposeConcertNote,
+} from './note';
 
 describe('frequencyToConcertNote', () => {
   it('maps A4 correctly with zero cents offset', () => {
@@ -59,6 +65,26 @@ describe('transposeConcertNote', () => {
   it('can respell transposed notes with sharps', () => {
     const instrument = INSTRUMENTS.find((item) => item.id === 'viola')!;
     expect(transposeConcertNote(concertBb3, instrument, 'sharp').display).toBe('A\u266F3');
+  });
+});
+
+describe('derivePitch', () => {
+  it('derives concert note, written note, and cents from a detected frequency', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'bb-clarinet')!;
+    const derivedPitch = derivePitch(233.243496812918, instrument);
+
+    expect(derivedPitch.concertNote?.display).toBe('B\u266D3');
+    expect(derivedPitch.writtenNote?.display).toBe('C4');
+    expect(derivedPitch.centsOff).toBeCloseTo(1.2, 2);
+  });
+
+  it('returns empty derived values when there is no stable frequency', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'viola')!;
+    expect(derivePitch(null, instrument)).toEqual({
+      concertNote: null,
+      writtenNote: null,
+      centsOff: null,
+    });
   });
 });
 

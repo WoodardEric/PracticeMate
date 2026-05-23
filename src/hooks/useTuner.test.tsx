@@ -1,10 +1,8 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { vi } from 'vitest';
-import { INSTRUMENTS } from '../data/instruments';
-import type { AccidentalPreference } from '../types/music';
 import { useTuner } from './useTuner';
 
-const findPitchMock = vi.fn(() => [233.08, 0.99] as const);
+const findPitchMock = vi.fn();
 const getUserMediaMock = vi.fn();
 
 vi.mock('pitchy', () => ({
@@ -51,22 +49,16 @@ class MockAudioContext {
   }
 }
 
-function Harness({
-  accidentalPreference,
-  instrumentId = 'trombone',
-}: {
-  accidentalPreference: AccidentalPreference;
-  instrumentId?: string;
-}) {
-  const instrument = INSTRUMENTS.find((item) => item.id === instrumentId)!;
-  const { pitchState, start } = useTuner(instrument, accidentalPreference);
+function Harness() {
+  const { pitchState, start } = useTuner();
 
   return (
     <div>
       <button type="button" onClick={() => void start()}>
         Start
       </button>
-      <output data-testid="written-note">{pitchState.writtenNote?.display ?? '--'}</output>
+      <output data-testid="frequency">{pitchState.frequencyHz?.toFixed(2) ?? '--'}</output>
+      <output data-testid="confidence">{pitchState.signalConfidence.toFixed(2)}</output>
     </div>
   );
 }
@@ -76,6 +68,7 @@ describe('useTuner', () => {
 
   beforeEach(() => {
     findPitchMock.mockClear();
+    findPitchMock.mockReturnValue([233.08, 0.99] as const);
     getUserMediaMock.mockResolvedValue({
       getTracks: () => [{ stop: vi.fn() }],
     });
@@ -109,57 +102,37 @@ describe('useTuner', () => {
     });
   });
 
-  it('uses the latest enharmonic preference for subsequent detections', async () => {
-    const { rerender } = render(<Harness accidentalPreference="flat" />);
+  it('reports the detected frequency from the pitch detector', async () => {
+    render(<Harness />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Start' }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('written-note')).toHaveTextContent('B\u266D3');
-    });
-
-    rerender(<Harness accidentalPreference="sharp" />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('written-note')).toHaveTextContent('A\u266F3');
-    });
-
-    expect(nextAnimationFrame).not.toBeNull();
-
-    await act(async () => {
-      nextAnimationFrame?.(16);
-    });
-
-    await waitFor(() => {
-      expect(screen.getByTestId('written-note')).toHaveTextContent('A\u266F3');
+      expect(screen.getByTestId('frequency')).toHaveTextContent('233.08');
+      expect(screen.getByTestId('confidence')).toHaveTextContent('0.99');
     });
   });
 
-  it('retransposes the written note when switching instruments live', async () => {
-    const { rerender } = render(
-      <Harness accidentalPreference="flat" instrumentId="trombone" />,
-    );
+  it('keeps the last stable frequency when a later frame has no reliable pitch lock', async () => {
+    render(<Harness />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Start' }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('written-note')).toHaveTextContent('B\u266D3');
-    });
-
-    rerender(<Harness accidentalPreference="flat" instrumentId="bb-clarinet" />);
-
-    await waitFor(() => {
-      expect(screen.getByTestId('written-note')).toHaveTextContent('C4');
+      expect(screen.getByTestId('frequency')).toHaveTextContent('233.08');
+      expect(screen.getByTestId('confidence')).toHaveTextContent('0.99');
     });
 
     expect(nextAnimationFrame).not.toBeNull();
+    findPitchMock.mockReturnValue([233.08, 0.2] as const);
 
     await act(async () => {
       nextAnimationFrame?.(16);
     });
 
     await waitFor(() => {
-      expect(screen.getByTestId('written-note')).toHaveTextContent('C4');
+      expect(screen.getByTestId('frequency')).toHaveTextContent('233.08');
+      expect(screen.getByTestId('confidence')).toHaveTextContent('0.20');
     });
   });
 });

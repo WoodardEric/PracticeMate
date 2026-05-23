@@ -1,4 +1,9 @@
-import type { AccidentalPreference, InstrumentProfile, NamedNote } from '../types/music';
+import type {
+  AccidentalPreference,
+  DerivedPitch,
+  InstrumentProfile,
+  NamedNote,
+} from '../types/music';
 
 const A4_FREQUENCY = 440;
 const A4_MIDI = 69;
@@ -70,6 +75,30 @@ export function transposeConcertNote(
     note.midi + instrument.writtenPitchOffsetSemitones + instrument.writtenOctaveShift * 12;
 
   return midiToNote(transposedMidi, accidentalPreference);
+}
+
+export function derivePitch(
+  frequencyHz: number | null,
+  instrument: InstrumentProfile,
+  accidentalPreference: AccidentalPreference = 'flat',
+): DerivedPitch {
+  if (frequencyHz === null) {
+    return {
+      concertNote: null,
+      writtenNote: null,
+      centsOff: null,
+    };
+  }
+
+  const concertNote = frequencyToConcertNote(frequencyHz, accidentalPreference);
+
+  return {
+    concertNote,
+    writtenNote: concertNote
+      ? transposeConcertNote(concertNote, instrument, accidentalPreference)
+      : null,
+    centsOff: concertNote?.centsOff ?? null,
+  };
 }
 
 export function clampBpm(value: number): number {

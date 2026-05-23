@@ -15,10 +15,7 @@ export default function App() {
   const selectedInstrument =
     INSTRUMENTS.find((instrument) => instrument.id === selectedInstrumentId) ?? DEFAULT_INSTRUMENT;
 
-  const { pitchState, start: startTuner, stop: stopTuner } = useTuner(
-    selectedInstrument,
-    accidentalPreference,
-  );
+  const { pitchState, start: startTuner, stop: stopTuner } = useTuner();
   const {
     settings,
     start: startMetronome,
@@ -40,9 +37,9 @@ export default function App() {
       <div className="layout-grid">
         <TunerPanel
           instruments={INSTRUMENTS}
+          instrument={selectedInstrument}
           selectedInstrumentId={selectedInstrument.id}
           onInstrumentChange={setSelectedInstrumentId}
-          clef={selectedInstrument.clef}
           pitchState={pitchState}
           accidentalPreference={accidentalPreference}
           onAccidentalPreferenceChange={setAccidentalPreference}

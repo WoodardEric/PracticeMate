@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { PitchDetector } from 'pitchy';
-import type { AccidentalPreference, DetectedPitch, InstrumentProfile } from '../types/music';
-import { frequencyToConcertNote, transposeConcertNote } from '../utils/note';
+import type { DetectedPitch } from '../types/music';
 
 const ANALYSER_SIZE = 2048;
 const MIN_CLARITY = 0.92;
@@ -13,9 +12,6 @@ const EMPTY_STATE: DetectedPitch = {
   permission: 'idle',
   listening: false,
   frequencyHz: null,
-  concertNote: null,
-  writtenNote: null,
-  centsOff: null,
   signalConfidence: 0,
 };
 
@@ -27,10 +23,7 @@ function getRootAudioContext(): typeof AudioContext | null {
   return window.AudioContext ?? ((window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext ?? null);
 }
 
-export function useTuner(
-  instrument: InstrumentProfile,
-  accidentalPreference: AccidentalPreference = 'flat',
-) {
+export function useTuner() {
   const [pitchState, setPitchState] = useState<DetectedPitch>(EMPTY_STATE);
 
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -39,36 +32,12 @@ export function useTuner(
   const detectorRef = useRef(PitchDetector.forFloat32Array(ANALYSER_SIZE));
   const inputBufferRef = useRef(new Float32Array(ANALYSER_SIZE));
   const animationFrameRef = useRef<number | null>(null);
-  const instrumentRef = useRef(instrument);
-  const accidentalPreferenceRef = useRef(accidentalPreference);
 
   useEffect(() => {
     return () => {
       void stop();
     };
   }, []);
-
-  useEffect(() => {
-    instrumentRef.current = instrument;
-  }, [instrument]);
-
-  useEffect(() => {
-    accidentalPreferenceRef.current = accidentalPreference;
-  }, [accidentalPreference]);
-
-  useEffect(() => {
-    setPitchState((current) => {
-      if (!current.concertNote) {
-        return current;
-      }
-
-      return {
-        ...current,
-        concertNote: frequencyToConcertNote(current.frequencyHz ?? current.concertNote.frequency, accidentalPreference),
-        writtenNote: transposeConcertNote(current.concertNote, instrument, accidentalPreference),
-      };
-    });
-  }, [accidentalPreference, instrument]);
 
   const samplePitch = () => {
     const analyser = analyserRef.current;
@@ -103,19 +72,10 @@ export function useTuner(
         signalConfidence: clarity,
       }));
     } else {
-      const nextAccidentalPreference = accidentalPreferenceRef.current;
-      const nextInstrument = instrumentRef.current;
-      const concertNote = frequencyToConcertNote(frequencyHz, nextAccidentalPreference);
-
       setPitchState({
         permission: 'granted',
         listening: true,
         frequencyHz,
-        concertNote,
-        writtenNote: concertNote
-          ? transposeConcertNote(concertNote, nextInstrument, nextAccidentalPreference)
-          : null,
-        centsOff: concertNote?.centsOff ?? null,
         signalConfidence: clarity,
       });
     }

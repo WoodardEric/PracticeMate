@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import type { AccidentalPreference, Clef, DetectedPitch, InstrumentProfile } from '../types/music';
+import type { AccidentalPreference, DetectedPitch, InstrumentProfile } from '../types/music';
+import { derivePitch } from '../utils/note';
 import { nextSmoothedScaleCents, stabilizeScaleDisplayCents } from './tunerScale';
 import { StaffNote } from './StaffNote';
 
@@ -14,9 +15,9 @@ const SCALE_SUBTICKS = [-40, -30, -20, -10, 10, 20, 30, 40] as const;
 
 interface TunerPanelProps {
   instruments: InstrumentProfile[];
+  instrument: InstrumentProfile;
   selectedInstrumentId: string;
   onInstrumentChange: (instrumentId: string) => void;
-  clef: Clef;
   pitchState: DetectedPitch;
   accidentalPreference: AccidentalPreference;
   onAccidentalPreferenceChange: (preference: AccidentalPreference) => void;
@@ -79,20 +80,25 @@ function indicatorLeft(centsOff: number | null) {
 
 export function TunerPanel({
   instruments,
+  instrument,
   selectedInstrumentId,
   onInstrumentChange,
-  clef,
   pitchState,
   accidentalPreference,
   onAccidentalPreferenceChange,
   onStart,
   onStop,
 }: TunerPanelProps) {
-  const [smoothedScaleCents, setSmoothedScaleCents] = useState<number | null>(pitchState.centsOff);
-  const previousConcertMidiRef = useRef<number | null>(pitchState.concertNote?.midi ?? null);
+  const { concertNote, writtenNote, centsOff } = derivePitch(
+    pitchState.frequencyHz,
+    instrument,
+    accidentalPreference,
+  );
+  const [smoothedScaleCents, setSmoothedScaleCents] = useState<number | null>(centsOff);
+  const previousConcertMidiRef = useRef<number | null>(concertNote?.midi ?? null);
 
   useEffect(() => {
-    const currentConcertMidi = pitchState.concertNote?.midi ?? null;
+    const currentConcertMidi = concertNote?.midi ?? null;
     const noteChanged =
       previousConcertMidiRef.current !== null &&
       currentConcertMidi !== null &&
@@ -101,24 +107,24 @@ export function TunerPanel({
     setSmoothedScaleCents((previousSmoothedCents) =>
       nextSmoothedScaleCents({
         previousSmoothedCents,
-        rawCents: pitchState.centsOff,
+        rawCents: centsOff,
         noteChanged,
       }),
     );
 
     previousConcertMidiRef.current = currentConcertMidi;
-  }, [pitchState.centsOff, pitchState.concertNote?.midi]);
+  }, [centsOff, concertNote?.midi]);
 
-  const noteLabel = pitchState.writtenNote?.display ?? '--';
-  const concertLabel = pitchState.concertNote?.display ?? 'No stable pitch';
+  const noteLabel = writtenNote?.display ?? '--';
+  const concertLabel = concertNote?.display ?? 'No stable pitch';
   const nextAccidentalPreference = accidentalPreference === 'flat' ? 'sharp' : 'flat';
   const scaleCentsOff = stabilizeScaleDisplayCents(smoothedScaleCents);
   const scaleState = centsScaleState(scaleCentsOff);
   const showDebugReadout = !import.meta.env.PROD;
   const centsLabel =
-    pitchState.centsOff === null
+    centsOff === null
       ? '--'
-      : `${pitchState.centsOff > 0 ? '+' : ''}${pitchState.centsOff.toFixed(1)} cents`;
+      : `${centsOff > 0 ? '+' : ''}${centsOff.toFixed(1)} cents`;
 
   return (
     <section className="panel tuner-panel">
@@ -177,7 +183,7 @@ export function TunerPanel({
             <p className="hero-note">{noteLabel}</p>
           </div>
 
-          <StaffNote note={pitchState.writtenNote} clef={clef} />
+          <StaffNote note={writtenNote} clef={instrument.clef} />
           <div className="enharmonic-toggle-row" role="group" aria-label="Enharmonic spelling">
             <button
               type="button"
@@ -207,7 +213,7 @@ export function TunerPanel({
           aria-valuemin={MIN_CENTS}
           aria-valuemax={MAX_CENTS}
           aria-valuenow={clampCents(scaleCentsOff)}
-          aria-valuetext={pitchState.centsOff === null ? 'No stable pitch' : `${pitchState.centsOff.toFixed(1)} cents`}
+          aria-valuetext={centsOff === null ? 'No stable pitch' : `${centsOff.toFixed(1)} cents`}
         >
           {SCALE_SUBTICKS.map((tick) => (
             <div

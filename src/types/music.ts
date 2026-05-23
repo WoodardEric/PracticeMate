@@ -33,10 +33,13 @@ export interface DetectedPitch {
   permission: PermissionState;
   listening: boolean;
   frequencyHz: number | null;
+  signalConfidence: number;
+}
+
+export interface DerivedPitch {
   concertNote: NamedNote | null;
   writtenNote: NamedNote | null;
   centsOff: number | null;
-  signalConfidence: number;
 }
 
 export interface MetronomeSettings {
