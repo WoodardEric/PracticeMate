@@ -88,4 +88,7 @@ Application state is intentionally coordinated in `src/App.tsx`, with `useTuner`
 - Favicon: [public/favicon.ico](public/favicon.ico)
 - Favicon attribution file: [public/favicon-attribution.txt](public/favicon-attribution.txt)
 - Icon creator: [Freepik on Flaticon](https://www.flaticon.com/free-icons/quarter-note)
-
+- Fingering chart SVGs: [src/assets/charts/](src/assets/charts/)
+- Fingering chart attribution file: [src/assets/charts/attribution.txt](src/assets/charts/attribution.txt)
+- Fingering chart creator: [Bret Pimentel](https://fingering.bretpimentel.com/)
+- Fingering charts were downloaded from the Fingering Diagram Builder for this non-commercial educational open-source project and are licensed under [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)

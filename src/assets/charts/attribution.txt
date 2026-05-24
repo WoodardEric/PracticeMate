@@ -1,0 +1,18 @@
+Fingering chart SVG attribution
+
+Creator: Bret Pimentel
+Source: Fingering Diagram Builder
+Source URL: https://fingering.bretpimentel.com/
+License: Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
+License URL: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+Covered files:
+- valve.svg
+- flute.svg
+
+Modification status:
+- valve.svg: downloaded from the Fingering Diagram Builder and kept as the original source SVG
+- flute.svg: downloaded from the Fingering Diagram Builder and kept as the original source SVG
+
+These chart assets are used in PracticeMate as part of a non-commercial educational open-source project.
+If any covered SVG is edited later, update this file to mark that asset as modified after download.
