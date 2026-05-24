@@ -77,6 +77,20 @@ export function transposeConcertNote(
   return midiToNote(transposedMidi, accidentalPreference);
 }
 
+export function writtenMidiToConcertMidi(writtenMidi: number, instrument: InstrumentProfile): number {
+  const roundedMidi = Math.round(writtenMidi);
+
+  return roundedMidi - instrument.writtenPitchOffsetSemitones - instrument.writtenOctaveShift * 12;
+}
+
+export function transposeWrittenNoteToConcert(
+  note: NamedNote,
+  instrument: InstrumentProfile,
+  accidentalPreference: AccidentalPreference = 'flat',
+): NamedNote {
+  return midiToNote(writtenMidiToConcertMidi(note.midi, instrument), accidentalPreference);
+}
+
 export function derivePitch(
   frequencyHz: number | null,
   instrument: InstrumentProfile,

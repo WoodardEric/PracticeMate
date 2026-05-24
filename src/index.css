@@ -118,6 +118,11 @@ button {
   grid-template-columns: minmax(0, 1fr);
 }
 
+.tuner-stack {
+  display: grid;
+  gap: 1rem;
+}
+
 .panel {
   padding: 1.35rem;
 }
@@ -516,6 +521,37 @@ input[type="checkbox"] {
   align-items: start;
 }
 
+.dev-pitch-panel .panel-header {
+  align-items: center;
+}
+
+.dev-pitch-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(14rem, 1fr) minmax(14rem, 1fr) minmax(14rem, 1fr);
+  align-items: start;
+}
+
+.dev-pitch-actions {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.dev-pitch-stepper {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.dev-pitch-stepper .button {
+  width: auto;
+}
+
+.dev-pitch-shortcuts {
+  margin: 0;
+  color: var(--text-dim);
+  font-size: 0.95rem;
+}
+
 .metronome-panel .panel-header {
   align-items: center;
 }
@@ -580,6 +616,10 @@ input[type="number"].bpm-input {
   }
 
   .metronome-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dev-pitch-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -657,5 +697,9 @@ input[type="number"].bpm-input {
 
   .accent-toggle {
     justify-content: space-between;
+  }
+
+  .dev-pitch-stepper {
+    flex-direction: column;
   }
 }

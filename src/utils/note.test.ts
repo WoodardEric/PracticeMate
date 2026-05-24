@@ -4,7 +4,10 @@ import {
   derivePitch,
   frequencyToConcertNote,
   midiToNote,
+  midiToFrequency,
   transposeConcertNote,
+  transposeWrittenNoteToConcert,
+  writtenMidiToConcertMidi,
 } from './note';
 
 describe('frequencyToConcertNote', () => {
@@ -68,6 +71,34 @@ describe('transposeConcertNote', () => {
   });
 });
 
+describe('writtenMidiToConcertMidi', () => {
+  it('maps written Bb clarinet C4 back to concert Bb3', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'bb-clarinet')!;
+
+    expect(writtenMidiToConcertMidi(60, instrument)).toBe(58);
+  });
+
+  it('keeps non-transposing instruments at the same MIDI note', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'viola')!;
+
+    expect(writtenMidiToConcertMidi(60, instrument)).toBe(60);
+  });
+
+  it('maps double bass written notes back down one octave', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'double-bass')!;
+
+    expect(writtenMidiToConcertMidi(58, instrument)).toBe(46);
+  });
+});
+
+describe('transposeWrittenNoteToConcert', () => {
+  it('maps written Bb clarinet C4 back to concert Bb3', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'bb-clarinet')!;
+
+    expect(transposeWrittenNoteToConcert(midiToNote(60), instrument).display).toBe('B\u266D3');
+  });
+});
+
 describe('derivePitch', () => {
   it('derives concert note, written note, and cents from a detected frequency', () => {
     const instrument = INSTRUMENTS.find((item) => item.id === 'bb-clarinet')!;
@@ -85,6 +116,17 @@ describe('derivePitch', () => {
       writtenNote: null,
       centsOff: null,
     });
+  });
+
+  it('round-trips a stepped written note through synthetic concert frequency', () => {
+    const instrument = INSTRUMENTS.find((item) => item.id === 'bb-trumpet')!;
+    const writtenMidi = 61;
+    const concertFrequency = midiToFrequency(writtenMidiToConcertMidi(writtenMidi, instrument));
+    const derivedPitch = derivePitch(concertFrequency, instrument);
+
+    expect(derivedPitch.writtenNote?.display).toBe('D\u266D4');
+    expect(derivedPitch.concertNote?.display).toBe('B3');
+    expect(derivedPitch.centsOff).toBeCloseTo(0, 6);
   });
 });
 
