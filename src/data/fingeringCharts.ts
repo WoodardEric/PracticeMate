@@ -5,9 +5,13 @@ import type {
 import type { NamedNote } from '../types/music';
 import { findGroupedFingering } from '../utils/fingering';
 import { bbTrumpetFingeringChart } from './bbTrumpetFingeringChart';
+import { euphoniumFingeringChart } from './euphoniumFingeringChart';
+import { tubaFingeringChart } from './tubaFingeringChart';
 
 const FINGERING_CHARTS_BY_INSTRUMENT_ID: Record<string, InstrumentFingeringChart> = {
   'bb-trumpet': bbTrumpetFingeringChart,
+  euphonium: euphoniumFingeringChart,
+  tuba: tubaFingeringChart,
 };
 
 export function lookupInstrumentFingeringChart(

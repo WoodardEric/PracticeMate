@@ -4,6 +4,7 @@ import { midiToNote } from '../utils/note';
 import { FingeringChart } from './FingeringChart';
 
 const trumpet = INSTRUMENTS.find((instrument) => instrument.id === 'bb-trumpet')!;
+const euphonium = INSTRUMENTS.find((instrument) => instrument.id === 'euphonium')!;
 const viola = INSTRUMENTS.find((instrument) => instrument.id === 'viola')!;
 
 describe('FingeringChart', () => {
@@ -30,5 +31,16 @@ describe('FingeringChart', () => {
     expect(container.querySelector('#valve-1')).toHaveAttribute('fill', '#000');
     expect(container.querySelector('#valve-2')).toHaveAttribute('fill', 'none');
     expect(container.querySelector('#valve-3')).toHaveAttribute('fill', '#000');
+  });
+
+  it('renders active valves for a supported euphonium note', () => {
+    const { container } = render(
+      <FingeringChart instrument={euphonium} note={midiToNote(60, 'flat')} />,
+    );
+
+    expect(screen.getByTestId('fingering-chart-render')).toBeInTheDocument();
+    expect(container.querySelector('#valve-1')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#valve-2')).toHaveAttribute('fill', 'none');
+    expect(container.querySelector('#valve-3')).toHaveAttribute('fill', 'none');
   });
 });
