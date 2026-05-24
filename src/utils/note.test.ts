@@ -38,7 +38,7 @@ describe('transposeConcertNote', () => {
   });
 
   it('transposes alto sax to written G4', () => {
-    const instrument = INSTRUMENTS.find((item) => item.id === 'eb-alto-sax')!;
+    const instrument = INSTRUMENTS.find((item) => item.id === 'alto-sax')!;
     expect(transposeConcertNote(concertBb3, instrument).display).toBe('G4');
   });
 

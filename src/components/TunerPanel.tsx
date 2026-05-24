@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { AccidentalPreference, DetectedPitch, InstrumentProfile } from '../types/music';
 import { derivePitch } from '../utils/note';
+import { FingeringChart } from './FingeringChart';
 import { nextSmoothedScaleCents, stabilizeScaleDisplayCents } from './tunerScale';
 import { StaffNote } from './StaffNote';
 
@@ -199,6 +200,8 @@ export function TunerPanel({
 
       <div className="staff-layout">
         <div className="staff-main-row">
+          <FingeringChart instrument={instrument} note={writtenNote} />
+
           <div className="note-card note-card-side">
             <p className="label note-card-label">Written note</p>
             <p className="hero-note">{noteLabel}</p>

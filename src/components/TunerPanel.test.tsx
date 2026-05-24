@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { TunerPanel } from './TunerPanel';
 import type { DetectedPitch } from '../types/music';
 import { INSTRUMENTS } from '../data/instruments';
+import { midiToFrequency } from '../utils/note';
 
 vi.mock('./StaffNote', () => ({
   StaffNote: () => <div data-testid="staff-note" />,
@@ -45,6 +46,8 @@ describe('TunerPanel', () => {
     renderTunerPanel();
 
     expect(screen.getByText('Written note')).toBeInTheDocument();
+    expect(screen.getByTestId('fingering-chart-shell')).toBeInTheDocument();
+    expect(screen.queryByTestId('fingering-chart-render')).not.toBeInTheDocument();
     expect(screen.getByText('No stable pitch')).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Select instrument' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Start tuner' })).toBeInTheDocument();
@@ -379,5 +382,52 @@ describe('TunerPanel', () => {
     );
 
     expect(screen.getByText('C4')).toBeInTheDocument();
+  });
+
+  it('keeps the same fingering when the visible note spelling toggles', () => {
+    const trumpet = INSTRUMENTS.find((instrument) => instrument.id === 'bb-trumpet')!;
+    const pitchState = {
+      permission: 'granted' as const,
+      listening: true,
+      frequencyHz: midiToFrequency(56),
+      signalConfidence: 0.98,
+    };
+    const { container, rerender } = render(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        instrument={trumpet}
+        selectedInstrumentId={trumpet.id}
+        onInstrumentChange={() => undefined}
+        pitchState={pitchState}
+        accidentalPreference="flat"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getByText('B\u266D3')).toBeInTheDocument();
+    expect(container.querySelector('#valve-1')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#valve-2')).toHaveAttribute('fill', 'none');
+    expect(container.querySelector('#valve-3')).toHaveAttribute('fill', 'none');
+
+    rerender(
+      <TunerPanel
+        instruments={INSTRUMENTS}
+        instrument={trumpet}
+        selectedInstrumentId={trumpet.id}
+        onInstrumentChange={() => undefined}
+        pitchState={pitchState}
+        accidentalPreference="sharp"
+        onAccidentalPreferenceChange={() => undefined}
+        onStart={() => undefined}
+        onStop={() => undefined}
+      />,
+    );
+
+    expect(screen.getByText('A\u266F3')).toBeInTheDocument();
+    expect(container.querySelector('#valve-1')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#valve-2')).toHaveAttribute('fill', 'none');
+    expect(container.querySelector('#valve-3')).toHaveAttribute('fill', 'none');
   });
 });
