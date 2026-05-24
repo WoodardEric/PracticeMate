@@ -65,4 +65,82 @@ describe('lookupInstrumentFingeringChart', () => {
     expect(getActivePathIds('euphonium', 62)).toEqual([]);
     expect(getActivePathIds('tuba', 50)).toEqual([]);
   });
+
+  it('returns the expected flute key combinations across the supported range', () => {
+    expect(getActivePathIds('flute', 60)).toEqual([
+      'thumb-B',
+      'LH-1',
+      'LH-2',
+      'LH-3',
+      'RH-1',
+      'RH-2',
+      'RH-3',
+      'low-C',
+      'low-B',
+    ]);
+    expect(getActivePathIds('flute', 62)).toEqual([
+      'thumb-B',
+      'LH-1',
+      'LH-2',
+      'LH-3',
+      'RH-1',
+      'RH-2',
+      'RH-3',
+    ]);
+    expect(getActivePathIds('flute', 64)).toEqual([
+      'thumb-B',
+      'LH-1',
+      'LH-2',
+      'LH-3',
+      'RH-1',
+      'RH-2',
+      'D-sharp',
+    ]);
+    expect(getActivePathIds('flute', 69)).toEqual(['thumb-B', 'LH-1', 'LH-2', 'D-sharp']);
+    expect(getActivePathIds('flute', 70)).toEqual(['thumb-B', 'LH-1', 'RH-1', 'D-sharp']);
+    expect(getActivePathIds('flute', 72)).toEqual(['LH-1', 'D-sharp']);
+    expect(getActivePathIds('flute', 77)).toEqual([
+      'thumb-B',
+      'LH-1',
+      'LH-2',
+      'LH-3',
+      'RH-1',
+      'D-sharp',
+    ]);
+    expect(getActivePathIds('flute', 81)).toEqual(['thumb-B', 'LH-1', 'LH-2', 'D-sharp']);
+    expect(getActivePathIds('flute', 82)).toEqual(['thumb-B', 'LH-1', 'RH-1', 'D-sharp']);
+    expect(getActivePathIds('flute', 84)).toEqual(['LH-1', 'D-sharp']);
+    expect(getActivePathIds('flute', 89)).toEqual([
+      'thumb-B',
+      'LH-1',
+      'LH-3',
+      'RH-1',
+      'D-sharp',
+    ]);
+    expect(getActivePathIds('flute', 95)).toEqual([
+      'thumb-B',
+      'LH-1',
+      'LH-3',
+      'G-sharp',
+      'trill-2',
+    ]);
+    expect(getActivePathIds('flute', 96)).toEqual([
+      'thumb-B-flat',
+      'LH-1',
+      'LH-2',
+      'LH-3',
+      'G-sharp',
+      'RH-1',
+    ]);
+  });
+
+  it('returns the same flute fingering for enharmonic spellings after flat normalization', () => {
+    expect(getActivePathIds('flute', 70, 'flat')).toEqual(['thumb-B', 'LH-1', 'RH-1', 'D-sharp']);
+    expect(getActivePathIds('flute', 70, 'sharp')).toEqual(['thumb-B', 'LH-1', 'RH-1', 'D-sharp']);
+  });
+
+  it('returns no fingering outside the supported flute range', () => {
+    expect(getActivePathIds('flute', 59)).toBeNull();
+    expect(getActivePathIds('flute', 97)).toBeNull();
+  });
 });

@@ -5,6 +5,7 @@ import { FingeringChart } from './FingeringChart';
 
 const trumpet = INSTRUMENTS.find((instrument) => instrument.id === 'bb-trumpet')!;
 const euphonium = INSTRUMENTS.find((instrument) => instrument.id === 'euphonium')!;
+const flute = INSTRUMENTS.find((instrument) => instrument.id === 'flute')!;
 const viola = INSTRUMENTS.find((instrument) => instrument.id === 'viola')!;
 
 describe('FingeringChart', () => {
@@ -42,5 +43,20 @@ describe('FingeringChart', () => {
     expect(container.querySelector('#valve-1')).toHaveAttribute('fill', '#000');
     expect(container.querySelector('#valve-2')).toHaveAttribute('fill', 'none');
     expect(container.querySelector('#valve-3')).toHaveAttribute('fill', 'none');
+  });
+
+  it('fills the expected flute key paths for a supported note', () => {
+    const { container } = render(
+      <FingeringChart instrument={flute} note={midiToNote(95, 'flat')} />,
+    );
+
+    expect(screen.getByTestId('fingering-chart-render')).toBeInTheDocument();
+    expect(container.querySelector('#thumb-B')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#LH-1')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#LH-3')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#G-sharp')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#trill-2')).toHaveAttribute('fill', '#000');
+    expect(container.querySelector('#D-sharp')).toHaveAttribute('fill', 'none');
+    expect(container.querySelector('#RH-1')).toHaveAttribute('fill', 'none');
   });
 });

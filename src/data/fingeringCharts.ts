@@ -6,9 +6,11 @@ import type { NamedNote } from '../types/music';
 import { findGroupedFingering } from '../utils/fingering';
 import { bbTrumpetFingeringChart } from './bbTrumpetFingeringChart';
 import { euphoniumFingeringChart } from './euphoniumFingeringChart';
+import { fluteFingeringChart } from './fluteFingeringChart';
 import { tubaFingeringChart } from './tubaFingeringChart';
 
 const FINGERING_CHARTS_BY_INSTRUMENT_ID: Record<string, InstrumentFingeringChart> = {
+  flute: fluteFingeringChart,
   'bb-trumpet': bbTrumpetFingeringChart,
   euphonium: euphoniumFingeringChart,
   tuba: tubaFingeringChart,
