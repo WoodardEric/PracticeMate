@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import type { AccidentalPreference, DetectedPitch, InstrumentProfile } from '../types/music';
+import type {
+  AccidentalPreference,
+  DetectedPitch,
+  InstrumentProfile,
+  NamedNote,
+} from '../types/music';
 import { derivePitch } from '../utils/note';
 import { nextSmoothedScaleCents, stabilizeScaleDisplayCents } from './tunerScale';
 import { StaffNote } from './StaffNote';
@@ -36,6 +41,18 @@ function formatFrequency(frequencyHz: number | null): string {
 
 function formatConfidence(signalConfidence: number): string {
   return `${Math.round(signalConfidence * 100)}%`;
+}
+
+function formatNoteName(noteName: string): string {
+  return noteName.replace('b', FLAT_SYMBOL).replace('#', SHARP_SYMBOL);
+}
+
+function formatWrittenNoteLabel(writtenNote: NamedNote | null, showDebugReadout: boolean): string {
+  if (!writtenNote) {
+    return '--';
+  }
+
+  return showDebugReadout ? writtenNote.display : formatNoteName(writtenNote.name);
 }
 
 function centsClass(centsOff: number | null) {
@@ -136,12 +153,12 @@ export function TunerPanel({
     previousConcertMidiRef.current = currentConcertMidi;
   }, [centsOff, concertNote?.midi]);
 
-  const noteLabel = writtenNote?.display ?? '--';
+  const showDebugReadout = !import.meta.env.PROD;
+  const noteLabel = formatWrittenNoteLabel(writtenNote, showDebugReadout);
   const concertLabel = concertNote?.display ?? 'No stable pitch';
   const nextAccidentalPreference = accidentalPreference === 'flat' ? 'sharp' : 'flat';
   const scaleCentsOff = stabilizeScaleDisplayCents(smoothedScaleCents);
   const scaleState = centsScaleState(scaleCentsOff);
-  const showDebugReadout = !import.meta.env.PROD;
   const centsLabel =
     centsOff === null
       ? '--'

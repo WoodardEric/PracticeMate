@@ -41,6 +41,10 @@ function renderTunerPanel({
 }
 
 describe('TunerPanel', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it('shows idle guidance when no stable pitch is present', () => {
     renderTunerPanel();
 
@@ -72,6 +76,25 @@ describe('TunerPanel', () => {
     expect(screen.getByText('+1.2 cents')).toBeInTheDocument();
     expect(screen.queryByText('0 = B\u266D3')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Stop tuner' })).toBeInTheDocument();
+  });
+
+  it('hides the written note octave in production mode', () => {
+    vi.stubEnv('PROD', true);
+
+    renderTunerPanel({
+      instrumentId: 'bb-clarinet',
+      pitchState: {
+        permission: 'granted',
+        listening: true,
+        frequencyHz: 233.243496812918,
+        signalConfidence: 0.97,
+      },
+    });
+
+    expect(screen.getByText('C')).toBeInTheDocument();
+    expect(screen.queryByText('C4')).not.toBeInTheDocument();
+    expect(screen.queryByText('B\u266D3')).not.toBeInTheDocument();
+    expect(screen.queryByText('+1.2 cents')).not.toBeInTheDocument();
   });
 
   it('surfaces waiting state while listening without a lock', () => {
