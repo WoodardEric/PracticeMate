@@ -3,6 +3,34 @@ import type { Clef, NamedNote } from '../types/music';
 import { toVexNoteSpec } from '../utils/notation';
 import { loadVexflow } from './vexflowLoader';
 
+const MIN_RENDER_WIDTH = 296;
+const RENDER_HORIZONTAL_PADDING = 16;
+const RENDER_HEIGHT = 272;
+const RENDER_SCALE = 1.45;
+const MIN_STAVE_WIDTH = 188;
+const STAVE_HORIZONTAL_INSET = 28;
+
+const STAFF_LINE_STYLE = {
+  lineWidth: 1.2,
+  strokeStyle: 'rgba(16, 33, 52, 0.24)',
+};
+
+const STAFF_MODIFIER_STYLE = {
+  fillStyle: 'rgba(16, 33, 52, 0.34)',
+  strokeStyle: 'rgba(16, 33, 52, 0.34)',
+};
+
+const NOTE_STYLE = {
+  fillStyle: '#102134',
+  lineWidth: 1.8,
+  strokeStyle: '#102134',
+};
+
+const LEDGER_LINE_STYLE = {
+  lineWidth: 2.4,
+  strokeStyle: '#102134',
+};
+
 interface StaffNoteProps {
   note: NamedNote | null;
   clef: Clef;
@@ -24,7 +52,7 @@ export function StaffNote({ note, clef }: StaffNoteProps) {
     let resizeObserver: ResizeObserver | null = null;
 
     void (async () => {
-      const { Accidental, Metrics, Renderer, Stave, StaveNote, TickContext } =
+      const { Accidental, BarlineType, Metrics, Renderer, Stave, StaveNote, TickContext } =
         await loadVexflow();
 
       if (!active || !shellRef.current || !renderRef.current) {
@@ -39,9 +67,9 @@ export function StaffNote({ note, clef }: StaffNoteProps) {
         renderRef.current.innerHTML = '';
 
         const shellWidth = Math.floor(shellRef.current.clientWidth);
-        const width = Math.max(280, shellWidth - 16);
-        const height = 220;
-        const scale = 1.25;
+        const width = Math.max(MIN_RENDER_WIDTH, shellWidth - RENDER_HORIZONTAL_PADDING);
+        const height = RENDER_HEIGHT;
+        const scale = RENDER_SCALE;
         const logicalWidth = width / scale;
         const logicalHeight = height / scale;
         const renderer = new Renderer(renderRef.current, Renderer.Backends.SVG);
@@ -50,7 +78,7 @@ export function StaffNote({ note, clef }: StaffNoteProps) {
         const context = renderer.getContext();
         context.scale(scale, scale);
 
-        const staveWidth = Math.max(180, logicalWidth - 40);
+        const staveWidth = Math.max(MIN_STAVE_WIDTH, logicalWidth - STAVE_HORIZONTAL_INSET);
         const staveX = Math.floor((logicalWidth - staveWidth) / 2);
         const noteSpec = toVexNoteSpec(note);
         const staveNote = new StaveNote({
@@ -58,6 +86,10 @@ export function StaffNote({ note, clef }: StaffNoteProps) {
           keys: [noteSpec.key],
           duration: 'q',
         });
+        staveNote.setStyle(NOTE_STYLE);
+        staveNote.setStemStyle(NOTE_STYLE);
+        staveNote.setLedgerLineStyle(LEDGER_LINE_STYLE);
+        staveNote.setKeyStyle(0, NOTE_STYLE);
 
         if (noteSpec.accidental) {
           staveNote.addModifier(new Accidental(noteSpec.accidental), 0);
@@ -73,15 +105,28 @@ export function StaffNote({ note, clef }: StaffNoteProps) {
         };
 
         const draftStave = new Stave(staveX, 0, staveWidth);
+        draftStave.setBegBarType(BarlineType.NONE);
+        draftStave.setEndBarType(BarlineType.NONE);
         draftStave.addClef(clef);
         const staffHeight = draftStave.getBoundingBox().getH();
         const staveY = Math.round(logicalHeight / 2 - staffHeight / 2);
         const stave = new Stave(staveX, staveY, staveWidth);
+        stave.setStyle(STAFF_LINE_STYLE);
+        stave.setConfigForLines(
+          Array.from({ length: stave.getNumLines() }, () => ({
+            visible: true,
+          })),
+        );
+        stave.setBegBarType(BarlineType.NONE);
+        stave.setEndBarType(BarlineType.NONE);
         stave.addClef(clef);
+        stave
+          .getModifiers(undefined, 'Clef')
+          .forEach((modifier) => modifier.setStyle(STAFF_MODIFIER_STYLE));
         stave.setContext(context).draw();
 
         positionNote(stave);
-        staveNote.setContext(context).draw();
+        staveNote.setContext(context).drawWithStyle();
       };
 
       renderStaff();

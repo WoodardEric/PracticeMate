@@ -368,12 +368,13 @@ input[type="checkbox"] {
 
 .staff-shell {
   background: #ffffff;
-  min-height: var(--tuner-note-panel-height);
-  height: var(--tuner-note-panel-height);
+  min-height: max(var(--tuner-note-panel-height), 272px);
+  height: auto;
   width: 100%;
-  padding: 0.75rem 0;
+  padding: 0.6rem 0 0.75rem;
   display: grid;
   place-items: center;
+  overflow: visible;
 }
 
 .staff-layout {
@@ -389,11 +390,13 @@ input[type="checkbox"] {
 }
 
 .staff-render {
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   min-height: 100%;
   height: 100%;
-  display: block;
+  display: grid;
+  place-items: center;
+  overflow: visible;
 }
 
 .staff-shell svg {
